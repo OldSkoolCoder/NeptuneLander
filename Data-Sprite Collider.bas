@@ -1,0 +1,15 @@
+10 poke 53269,1 : REM bit 0 = sprite 0
+20 POKE 2040,190 : REM SPRITE POINT * 64 = 190 * 64 = 12288
+30 Y = 60 : POKE 53249,Y
+40 X = 60 : POKE 53248,X
+50 POKE 53287,0
+60 FOR I = 0 TO 62 : POKE 12160 + I, 255 : NEXT I
+70 print "{clear}{down*2}{right*2}*{right*16}*"
+80 DX = 1 : POKE 53273, PEEK(53273) OR 2 : REM POKE 53274, PEEK(53274) OR 2
+
+100 X = X + DX : poke 53248, X
+105 CD = PEEK(53279) : PRINT "{home}{down*6}";CD;" ";X;" "
+110 IF CD <> 1 THEN 100
+120 IF X <= 46 THEN DX = 1 : GOTO 140
+130 IF X >= 153 THEN DX = -1
+140 GOTO 100
