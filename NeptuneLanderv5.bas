@@ -1,4 +1,4 @@
-        10 GOSUB 250 : poke 53269,1 : REM bit 0 = sprite 0
+10 GOSUB 250 : poke 53269,1 : REM bit 0 = sprite 0
 20 POKE 2040,175 : REM SPRITE POINT * 64 = 175 * 64 = 11200
 30 Y = 60 : POKE 53249,Y
 40 X = 60 : POKE 53248,X

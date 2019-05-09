@@ -1,0 +1,3 @@
+Land Zone 1 : X=64, Y=229
+Land Zone 2 : X=144, Y=133
+Land Zone 3 : X=265, Y=205
