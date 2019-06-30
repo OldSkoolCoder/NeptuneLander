@@ -37,24 +37,12 @@
         <PostBuildCommands />
     </BuildEvents>
     <BuildList>
-        <FileName>gameMemory.asm</FileName>
-        <FileName>libGaugeRoutines.asm</FileName>
         <FileName>libInput.asm</FileName>
         <FileName>libMath.asm</FileName>
-        <FileName>libScreen.asm</FileName>
-        <FileName>libSound.asm</FileName>
         <FileName>libSprite.asm</FileName>
-        <FileName>NeptuneLander.asm</FileName>
-        <FileName>NeptuneLander.bas</FileName>
-        <FileName>NeptuneLander2.asm</FileName>
-        <FileName>NeptuneLander.bas</FileName>
-        <FileName>NeptuneLanderv2.bas</FileName>
-        <FileName>NeptuneLanderv3.bas</FileName>
-        <FileName>Data-Sprite Collider.bas</FileName>
-        <FileName>NeptuneLanderv4bas.bas</FileName>
-        <FileName>NeptuneLanderv5.bas</FileName>
-        <FileName>LandingXRef.bas</FileName>
-        <FileName>NeptuneLanderv6.bas</FileName>
+        <FileName>NeptuneLander_V1.asm</FileName>
+        <FileName>libConstants.asm</FileName>
+        <FileName>libScreen.asm</FileName>
     </BuildList>
     <DetermineBuildOrder>0</DetermineBuildOrder>
     <PaddingByte>0</PaddingByte>
@@ -116,6 +104,61 @@
             <FileOpen>False</FileOpen>
         </SourceFile>
         <SourceFile>
+            <Name>libConstants.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>libInput.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>True</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>libMath.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>True</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>libScreen.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>libSprite.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>True</FileOpen>
+        </SourceFile>
+        <SourceFile>
             <Name>NeptuneLander.bas</Name>
             <PrgName />
             <FileType>1</FileType>
@@ -136,6 +179,17 @@
             <Bookmarks />
             <Topmost>False</Topmost>
             <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>NeptuneLander_V1.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>True</Topmost>
+            <FileOpen>True</FileOpen>
         </SourceFile>
         <SourceFile>
             <Name>NeptuneLanderv2.bas</Name>
@@ -189,7 +243,7 @@
             <Regions />
             <Breakpoints />
             <Bookmarks />
-            <Topmost>True</Topmost>
+            <Topmost>False</Topmost>
             <FileOpen>True</FileOpen>
         </SourceFile>
     </SourceFiles>
