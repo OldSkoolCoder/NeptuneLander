@@ -32,8 +32,8 @@ SPRITE0         = $07F8
 ; in gameMain.asm 
 
 
-; 192 decimal * 64(sprite size) = 12288(hex $3000)
-SPRITERAM       = 192
+; 192 decimal * 64(sprite size) = 10880(hex $2A80)
+SPRITERAM       = 170
 
 ;===============================================================================
 ; $D000-$DFFF  IO (4K)
@@ -49,6 +49,7 @@ RASTER          = $D012
 SPENA           = $D015
 SCROLX          = $D016
 VMCSB           = $D018
+VICIRQ          = $D019
 SPBGPR          = $D01B
 SPMC            = $D01C
 SPSPCL          = $D01E
@@ -85,3 +86,50 @@ SIGVOL          = $D418 ;(54296)
 COLORRAM        = $D800
 CIAPRA          = $DC00
 CIAPRB          = $DC01
+
+; Kernel Jump Vectors
+krljmp_PCINT$       = $FF81
+krljmp_IOINIT$      = $FF84
+krljmp_RAMTAS$      = $FF87
+krljmp_RESTOR$      = $FF8A
+krljmp_VECTOR$      = $FF8D
+krljmp_SETMSG$      = $FF90
+krljmp_SECOND$      = $FF93
+krljmp_TKSA$        = $FF96
+krljmp_MEMTOP$      = $FF99
+krljmp_MEMBOT$      = $FF9C
+krljmp_SCNKEY$      = $FF9F
+krljmp_SETTMO$      = $FFA2
+krljmp_ACPTR$       = $FFA5
+krljmp_CIOUT$       = $FFA8
+krljmp_UNTALK$      = $FFAB
+krljmp_UNLSN$       = $FFAE
+krljmp_LISTEN$      = $FFB1
+krljmp_TALK$        = $FFB4
+krljmp_READST$      = $FFB7
+krljmp_SETLFS$      = $FFBA
+krljmp_SETNAM$      = $FFBD
+krljmp_OPEN$        = $FFC0
+krljmp_CLOSE$       = $FFC3
+krljmp_CHKIN$       = $FFC6
+krljmp_CHKOUT$      = $FFC9
+krljmp_CLRCHN$      = $FFCC
+krljmp_CHRIN$       = $FFCF
+krljmp_CHROUT$      = $FFD2
+krljmp_LOAD$        = $FFD5
+krljmp_SAVE$        = $FFD8
+krljmp_SETTIM$      = $FFDB
+krljmp_RDTIM$       = $FFDE
+krljmp_STOP$        = $FFE1
+krljmp_GETIN$       = $FFE4
+krljmp_CLALL$       = $FFE7
+krljmp_UDTIM$       = $FFEA
+krljmp_SCREEN$      = $FFED
+krljmp_PLOT$        = $FFF0
+krljmp_BASE$        = $FFF3
+
+spLunaLander    = 0
+spThrustDown    = 2
+spThrustLeft    = 3
+spThrustRight   = 4
+spNoThrust      = 5
