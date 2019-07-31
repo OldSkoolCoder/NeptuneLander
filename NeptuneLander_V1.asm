@@ -22,13 +22,19 @@ incbin "LandScape.cst", 0, 127
 ;* Game Working Variable Space                                           *
 ;*************************************************************************
 
+; Binary Fraction Format :-
+;     First Byte is Fraction = 1/128 -> 1/2
+;     Second Byte is Whole Number
+
 LunaLanderXLo
+        brk
         brk
 
 LunaLanderXHi
         brk
 
 LunaLanderY
+        brk
         brk
 
 LunaLanderSpNo
@@ -43,6 +49,27 @@ ThrustSpNo
 ThrustColour
         brk
 
+VerticalVelocity
+        brk
+        brk
+
+Gravity
+        brk
+        brk
+
+Thrust
+        brk
+        brk
+
+HorizontalVelocity
+        brk
+        brk
+
+HorizontalInertia
+        brk
+        brk
+
+
 incasm "libSprite.asm"
 incasm "libMath.asm"
 incasm "libInput.asm"
@@ -54,6 +81,12 @@ GameStart
         jsr SetUpLunarSprite
         jsr SetUpCustomCharacters
         jsr SetUpLevelOneScene
+
+        jsr SetUpGameVariables
+
+GameLoop
+        jsr ReadInputAndUpdateVariables
+        jsr UpdateSpritePosition
 
         rts
 
@@ -112,3 +145,71 @@ SetUpLevelOneScene
         LIBPRINT_PRINTSTRING_A ScnLevelOne
         rts
         
+        ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
+SetUpGameVariables
+        lda #0
+        sta VerticalVelocity
+        sta HorizontalVelocity
+
+        lda #6
+        sta Gravity
+        sta Thrust
+        lda #9
+        sta HorizontalInertia
+
+        rts
+
+ReadInputAndUpdateVariables
+        libInputUpdate
+
+        LIBINPUT_GETHELD GameportLeftMask
+        bne @LeftDetected
+        jmp @TestRight
+
+        ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
+@LeftDetected
+        LIBMATH_ADD16BIT_AAVVAA HorizontalVelocity, HorizontalInertia, HorizontalVelocity
+        LIBSPRITE_SETFRAME_AV ThrustSpNo, spThrustLeft
+
+@TestRight
+        LIBINPUT_GETHELD GameportRightMask
+        bne @RightDetected
+        jmp @TestFire
+
+        ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
+@RightDetected
+        LIBMATH_SUB16BIT_AAVVAA HorizontalVelocity, HorizontalInertia, HorizontalVelocity
+        LIBSPRITE_SETFRAME_AV ThrustSpNo, spThrustRight
+
+@TestFire
+        LIBINPUT_GETHELD GameportFireMask
+        bne @FireDetected
+        jmp @NoInput
+
+        ;110 IF A = 22 THEN VV = VV - T : TS=183 : 
+@FireDetected
+        LIBMATH_SUB16BIT_AAVVAA VerticalVelocity, Thrust, VerticalVelocity
+        LIBSPRITE_SETFRAME_AV ThrustSpNo, spThrustRight
+        rts
+
+        ;200 VV = VV + G : IF VV > 2 THEN VV = 2
+@NoInput
+        LIBMATH_ADD16BIT_AAVVAA VerticalVelocity, Gravity, VerticalVelocity
+        lda VerticalVelocity+1
+        cmp #2
+        bne @InputFinish
+
+        lda #2
+        sta VerticalVelocity+1
+        lda #0
+        sta VerticalVelocity
+
+@InputFinish
+        rts
+
+UpdateSpritePosition
+        ; 210 Y = (Y+VV) : X = (X+HV)
+        LIBMATH_ADD8BIT_AAA LunaLanderY, VerticalVelocity, LunaLanderY
+
+        rts
+
