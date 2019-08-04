@@ -201,3 +201,36 @@ defm    LIBMATH_SUB16BIT_AAVVAA
         sbc #/3 ; Subtract borrow and MSB of NUM2
         sta /5  ; Store sum in MSB of sum
         endm
+
+;==============================================================================
+
+defm    LIBMATH_ADD16BIT_AAA
+                  ; /1 = 1st Number Word (Address)
+                  ; /2 = 2nd Number Word (Address)
+                  ; /3 = 3rd Number Word (Address)
+
+        clc       ; Clear carry before first add
+        lda /1    ; Get LSB of first number
+        adc /2    ; Add LSB of second number
+        sta /3    ; Store in LSB of sum
+        lda /1+1  ; Get MSB of first number
+        adc /2+1  ; Add carry and MSB of NUM2
+        sta /3+1  ; Store sum in MSB of sum
+        endm
+
+;==============================================================================
+
+defm    LIBMATH_SUB16BIT_AAA
+                  ; /1 = 1st Number Word (Address)
+                  ; /2 = 2nd Number Word (Address)
+                  ; /3 = 3rd Number Word (Address)
+        sec       ; sec is the same as clear borrow
+        lda /1    ; Get LSB of first number
+        sbc /2    ; Subtract LSB of second number
+        sta /3    ; Store in LSB of sum
+        lda /1+1  ; Get MSB of first number
+        sbc /2+1  ; Subtract borrow and MSB of NUM2
+        sta /3+1  ; Store sum in MSB of sum
+        endm
+
+

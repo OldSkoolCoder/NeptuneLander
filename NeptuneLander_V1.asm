@@ -26,15 +26,19 @@ incbin "LandScape.cst", 0, 127
 ;     First Byte is Fraction = 1/128 -> 1/2
 ;     Second Byte is Whole Number
 
-LunaLanderXLo
+LunaLanderXFrac
         brk
+
+LunaLanderXLo
         brk
 
 LunaLanderXHi
         brk
 
-LunaLanderY
+LunaLanderYFrac
         brk
+
+LunaLanderY
         brk
 
 LunaLanderSpNo
@@ -46,27 +50,40 @@ LunaLanderColour
 ThrustSpNo
         BYTE 1
 
+ThrustFrameNo
+        brk
+
 ThrustColour
+        brk
+
+VerticalVelocityFrac
         brk
 
 VerticalVelocity
         brk
+
+GravityFrac
         brk
 
 Gravity
         brk
+
+ThrustFrac
         brk
 
 Thrust
         brk
+
+HorizontalVelocityFrac
         brk
 
 HorizontalVelocity
         brk
+
+HorizontalInertiaFrac
         brk
 
 HorizontalInertia
-        brk
         brk
 
 
@@ -85,9 +102,13 @@ GameStart
         jsr SetUpGameVariables
 
 GameLoop
+        LIBSCREEN_WAIT_V 255
+
         jsr ReadInputAndUpdateVariables
         jsr UpdateSpritePosition
 
+        jsr libSpritesUpdate
+        jmp GameLoop
         rts
 
 
@@ -150,59 +171,68 @@ SetUpGameVariables
         lda #0
         sta VerticalVelocity
         sta HorizontalVelocity
-
-        lda #6
         sta Gravity
         sta Thrust
-        lda #9
         sta HorizontalInertia
+
+        lda #1
+        sta GravityFrac
+        sta ThrustFrac
+        lda #1
+        sta HorizontalInertiaFrac
 
         rts
 
 ReadInputAndUpdateVariables
-        libInputUpdate
+        jsr libInputUpdate
 
         LIBINPUT_GETHELD GameportLeftMask
-        bne @LeftDetected
-        jmp @TestRight
+        bne @TestRight
 
         ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
-@LeftDetected
-        LIBMATH_ADD16BIT_AAVVAA HorizontalVelocity, HorizontalInertia, HorizontalVelocity
-        LIBSPRITE_SETFRAME_AV ThrustSpNo, spThrustLeft
+        LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        ldx #spThrustLeft
+        stx ThrustFrameNo
+        jmp @InputProcessed
 
 @TestRight
         LIBINPUT_GETHELD GameportRightMask
-        bne @RightDetected
-        jmp @TestFire
+        bne @TestFire
 
         ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
-@RightDetected
-        LIBMATH_SUB16BIT_AAVVAA HorizontalVelocity, HorizontalInertia, HorizontalVelocity
-        LIBSPRITE_SETFRAME_AV ThrustSpNo, spThrustRight
+        LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        ldx #spThrustRight
+        stx ThrustFrameNo
+        jmp @InputProcessed
 
 @TestFire
         LIBINPUT_GETHELD GameportFireMask
-        bne @FireDetected
-        jmp @NoInput
+        bne @NoInput
 
         ;110 IF A = 22 THEN VV = VV - T : TS=183 : 
 @FireDetected
-        LIBMATH_SUB16BIT_AAVVAA VerticalVelocity, Thrust, VerticalVelocity
-        LIBSPRITE_SETFRAME_AV ThrustSpNo, spThrustRight
-        rts
+        LIBMATH_SUB16BIT_AAA VerticalVelocityFrac, ThrustFrac, VerticalVelocityFrac
+        ldx #spThrustDown
+        stx ThrustFrameNo
+        jmp @GravityByPass
 
         ;200 VV = VV + G : IF VV > 2 THEN VV = 2
 @NoInput
-        LIBMATH_ADD16BIT_AAVVAA VerticalVelocity, Gravity, VerticalVelocity
-        lda VerticalVelocity+1
+        ldx #spNoThrust
+        stx ThrustFrameNo
+
+@InputProcessed
+        LIBMATH_ADD16BIT_AAA VerticalVelocityFrac, GravityFrac, VerticalVelocityFrac
+
+@GravityByPass
+        lda VerticalVelocity
         cmp #2
         bne @InputFinish
 
         lda #2
-        sta VerticalVelocity+1
-        lda #0
         sta VerticalVelocity
+        lda #0
+        sta VerticalVelocityFrac
 
 @InputFinish
         rts
@@ -210,6 +240,16 @@ ReadInputAndUpdateVariables
 UpdateSpritePosition
         ; 210 Y = (Y+VV) : X = (X+HV)
         LIBMATH_ADD8BIT_AAA LunaLanderY, VerticalVelocity, LunaLanderY
+        LIBMATH_ADD16BIT_AAA LunaLanderXLo, HorizontalVelocity, LunaLanderXLo
+
+        ;215 POKE 2041,TS : POKE 53250, XL : POKE 53251, Y
+        ;216 POKE 53249, Y : POKE 53248,XL : POKE 53264, XH : REM CC=CC+1
+        LIBSPRITE_SETFRAME_AA ThrustSpNo, ThrustFrameNo
+
+        lda #0
+        sta LunaLanderXHi
+        LIBSPRITE_SETPOSITION_AAAA LunaLanderSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
+        LIBSPRITE_SETPOSITION_AAAA ThrustSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
 
         rts
 

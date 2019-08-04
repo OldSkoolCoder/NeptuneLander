@@ -130,6 +130,6 @@ krljmp_BASE$        = $FFF3
 
 spLunaLander    = 0
 spThrustDown    = 2
-spThrustLeft    = 3
-spThrustRight   = 4
+spThrustLeft    = 4
+spThrustRight   = 3
 spNoThrust      = 5
