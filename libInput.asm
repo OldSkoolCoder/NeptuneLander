@@ -9,6 +9,7 @@ GameportDownMask        = %00000010
 GameportLeftMask        = %00000100
 GameportRightMask       = %00001000
 GameportFireMask        = %00010000
+GameportNoInputMask     = %00011111
 FireDelayMax            = 30
 
 ;===============================================================================

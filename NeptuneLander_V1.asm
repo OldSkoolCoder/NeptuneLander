@@ -56,6 +56,15 @@ ThrustFrameNo
 ThrustColour
         brk
 
+ManuoverSpNo
+        BYTE 2
+
+ManuoverFrameNo
+        brk
+
+ManuoverColour
+        brk
+
 VerticalVelocityFrac
         brk
 
@@ -86,6 +95,11 @@ HorizontalInertiaFrac
 HorizontalInertia
         brk
 
+GameLoopFrameTracker
+        brk
+
+FrameSkipRate
+        BYTE 03
 
 incasm "libSprite.asm"
 incasm "libMath.asm"
@@ -104,10 +118,30 @@ GameStart
 GameLoop
         LIBSCREEN_WAIT_V 255
 
+        lda #1
+        sta EXTCOL
+
+        ;LIBSCREEN_DEBUG16BIT_VVAA 1,1,VerticalVelocity, VerticalVelocityFrac
+        ;LIBSCREEN_DEBUG8BIT_VVA 8,1,LunaLanderY
+
+        lda GameLoopFrameTracker
+        bne GameLooper
+
         jsr ReadInputAndUpdateVariables
         jsr UpdateSpritePosition
 
-        jsr libSpritesUpdate
+        ;jsr libSpritesUpdate
+
+GameLooper
+        lda GameLoopFrameTracker
+        clc
+        adc #$01
+        and FrameSkipRate
+        sta GameLoopFrameTracker
+
+        lda #0
+        sta EXTCOL
+
         jmp GameLoop
         rts
 
@@ -124,6 +158,7 @@ SetUpLunarSprite
 
         lda #Red
         sta ThrustColour
+        sta ManuoverColour
 
         ; POKE 53273, PEEK(53273) OR 2
         lda VICIRQ
@@ -134,21 +169,25 @@ SetUpLunarSprite
         ; 25 POKE 2041,186
         LIBSPRITE_SETFRAME_AV LunaLanderSpNo, spLunaLander
         LIBSPRITE_SETFRAME_AV ThrustSpNo, spNoThrust
+        LIBSPRITE_SETFRAME_AV ManuoverSpNo, spNoThrust
 
         ;poke 53269,3
         LIBSPRITE_ENABLE_AV LunaLanderSpNo, True
         LIBSPRITE_ENABLE_AV ThrustSpNo, True
+        LIBSPRITE_ENABLE_AV ManuoverSpNo, True
 
         ; 30 Y = 60 : POKE 53249,Y : POKE 53251,Y
         ; 40 X = 60 : POKE 53248,X : POKE 53250,X
         LIBSPRITE_SETPOSITION_AAAA LunaLanderSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
         LIBSPRITE_SETPOSITION_AAAA ThrustSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
+        LIBSPRITE_SETPOSITION_AAAA ManuoverSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
 
         ; POKE 53287,0
         LIBSPRITE_SETCOLOR_AA LunaLanderSpNo, LunaLanderColour
 
         ; POKE 53288,2
         LIBSPRITE_SETCOLOR_AA ThrustSpNo, ThrustColour
+        LIBSPRITE_SETCOLOR_AA ManuoverSpNo, ManuoverColour
         LIBSPRITE_SETMULTICOLORS_VV Yellow, LightGray
         rts
 
@@ -175,10 +214,11 @@ SetUpGameVariables
         sta Thrust
         sta HorizontalInertia
 
-        lda #1
+        lda #2
         sta GravityFrac
+        lda #4
         sta ThrustFrac
-        lda #1
+        lda #2
         sta HorizontalInertiaFrac
 
         rts
@@ -192,8 +232,7 @@ ReadInputAndUpdateVariables
         ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
         LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
         ldx #spThrustLeft
-        stx ThrustFrameNo
-        jmp @InputProcessed
+        stx ManuoverFrameNo
 
 @TestRight
         LIBINPUT_GETHELD GameportRightMask
@@ -202,8 +241,7 @@ ReadInputAndUpdateVariables
         ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
         LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
         ldx #spThrustRight
-        stx ThrustFrameNo
-        jmp @InputProcessed
+        stx ManuoverFrameNo
 
 @TestFire
         LIBINPUT_GETHELD GameportFireMask
@@ -216,11 +254,15 @@ ReadInputAndUpdateVariables
         stx ThrustFrameNo
         jmp @GravityByPass
 
-        ;200 VV = VV + G : IF VV > 2 THEN VV = 2
 @NoInput
+        LIBINPUT_GETHELD GameportNoInputMask
+        cmp #GameportNoInputMask
+        bne @InputProcessed
         ldx #spNoThrust
         stx ThrustFrameNo
+        stx ManuoverFrameNo
 
+        ;200 VV = VV + G : IF VV > 2 THEN VV = 2
 @InputProcessed
         LIBMATH_ADD16BIT_AAA VerticalVelocityFrac, GravityFrac, VerticalVelocityFrac
 
@@ -229,7 +271,7 @@ ReadInputAndUpdateVariables
         cmp #2
         bne @InputFinish
 
-        lda #2
+        lda #1
         sta VerticalVelocity
         lda #0
         sta VerticalVelocityFrac
@@ -239,17 +281,17 @@ ReadInputAndUpdateVariables
 
 UpdateSpritePosition
         ; 210 Y = (Y+VV) : X = (X+HV)
-        LIBMATH_ADD8BIT_AAA LunaLanderY, VerticalVelocity, LunaLanderY
-        LIBMATH_ADD16BIT_AAA LunaLanderXLo, HorizontalVelocity, LunaLanderXLo
+        LIBMATH_ADD16BIT_AAA LunaLanderYFrac, VerticalVelocityFrac, LunaLanderYFrac
+        LIBMATH_ADD16BIT_AAA LunaLanderXFrac, HorizontalVelocityFrac, LunaLanderXFrac
 
         ;215 POKE 2041,TS : POKE 53250, XL : POKE 53251, Y
         ;216 POKE 53249, Y : POKE 53248,XL : POKE 53264, XH : REM CC=CC+1
         LIBSPRITE_SETFRAME_AA ThrustSpNo, ThrustFrameNo
+        LIBSPRITE_SETFRAME_AA ManuoverSpNo, ManuoverFrameNo
 
-        lda #0
-        sta LunaLanderXHi
         LIBSPRITE_SETPOSITION_AAAA LunaLanderSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
         LIBSPRITE_SETPOSITION_AAAA ThrustSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
+        LIBSPRITE_SETPOSITION_AAAA ManuoverSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
 
         rts
 
