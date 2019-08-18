@@ -129,6 +129,7 @@ GameLoop
 
         jsr ReadInputAndUpdateVariables
         jsr UpdateSpritePosition
+        jsr DidWeCollideWithScene
 
         ;jsr libSpritesUpdate
 
@@ -295,3 +296,14 @@ UpdateSpritePosition
 
         rts
 
+DidWeCollideWithScene
+        LIBSPRITE_DIDCOLLIDEWITHDATA_A LunaLanderSpNo
+        beq @DidNotCollide
+        ldx #2
+        stx EXTCOL
+
+@DidNotCollide
+        clc
+        adc #$30
+        sta $0400
+        rts

@@ -53,6 +53,7 @@ VICIRQ          = $D019
 SPBGPR          = $D01B
 SPMC            = $D01C
 SPSPCL          = $D01E
+SPBGCL          = $D01F
 EXTCOL          = $D020
 BGCOL0          = $D021
 BGCOL1          = $D022

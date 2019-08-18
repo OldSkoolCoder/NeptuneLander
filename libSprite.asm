@@ -333,3 +333,16 @@ lSoUSkip
 lSoUFinished
 
         rts
+
+;===============================================================================
+
+
+defm    LIBSPRITE_DIDCOLLIDEWITHDATA_A  ; /1 = Sprite Number (Address)
+       
+        ldy /1
+        lda SpriteNumberMask,y
+        and SPBGCL
+        
+        endm
+
+
