@@ -134,3 +134,10 @@ spThrustDown    = 2
 spThrustLeft    = 4
 spThrustRight   = 3
 spNoThrust      = 5
+
+GF_InFlight      = 1
+GF_Landed        = 2
+GF_Dying         = 3
+GF_Dead          = 4
+GF_Menu          = 0
+

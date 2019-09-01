@@ -13,7 +13,7 @@ incbin "DereksExplosions.spt", 5, 16, true
 
 ; CharacterSet
 *=$3000
-incbin "LandScape.cst", 0, 127
+incbin "LandScape.cst", 0, 255
 
 *=$0820
         jmp GameStart
@@ -101,20 +101,47 @@ GameLoopFrameTracker
 FrameSkipRate
         BYTE 03
 
+CollidedWithBackground
+        brk
+
+VerticalBarValue
+        brk
+
+FuelBarValueFrac
+        brk
+
+FuelBarValue
+        brk
+
+ThrustCostFrac
+        BYTE 64
+
+ThrustCost
+        brk
+
 incasm "libSprite.asm"
 incasm "libMath.asm"
 incasm "libInput.asm"
 incasm "libConstants.asm"
 incasm "libScreen.asm"
 incasm "libPrint.asm"
+incasm "libBarsAndGauges.asm"
 
 GameStart
+        jsr SetUpLevelOneScene
         jsr SetUpLunarSprite
         jsr SetUpCustomCharacters
-        jsr SetUpLevelOneScene
 
         jsr SetUpGameVariables
 
+        LIBBARSANDGAUGES_INITYBAR_AV $044E,12
+        lda #Green
+        sta $D916
+
+        LIBBARSANDGAUGES_INITYBAR_AV $044D,12
+        lda #Red
+        sta $D9DD
+        sta $DA05
 GameLoop
         LIBSCREEN_WAIT_V 255
 
@@ -124,6 +151,12 @@ GameLoop
         ;LIBSCREEN_DEBUG16BIT_VVAA 1,1,VerticalVelocity, VerticalVelocityFrac
         ;LIBSCREEN_DEBUG8BIT_VVA 8,1,LunaLanderY
 
+        lda CollidedWithBackground
+        cmp #False
+        beq @NoGameDeathScene
+        jmp GameDeathScene
+
+@NoGameDeathScene
         lda GameLoopFrameTracker
         bne GameLooper
 
@@ -131,9 +164,10 @@ GameLoop
         jsr UpdateSpritePosition
         jsr DidWeCollideWithScene
 
-        ;jsr libSpritesUpdate
-
+        jsr UpdateBarsAndGauges
 GameLooper
+        jsr libSpritesUpdate
+
         lda GameLoopFrameTracker
         clc
         adc #$01
@@ -146,6 +180,15 @@ GameLooper
         jmp GameLoop
         rts
 
+GameDeathScene
+        LIBSPRITE_ISANIMPLAYING_A LunaLanderSpNo
+        bne GameLooper
+
+        jsr libInputUpdate
+        LIBINPUT_GETHELD GameportFireMask
+        bne GameLooper
+
+        jmp GameStart
 
 
 SetUpLunarSprite
@@ -190,6 +233,9 @@ SetUpLunarSprite
         LIBSPRITE_SETCOLOR_AA ThrustSpNo, ThrustColour
         LIBSPRITE_SETCOLOR_AA ManuoverSpNo, ManuoverColour
         LIBSPRITE_SETMULTICOLORS_VV Yellow, LightGray
+
+        LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, False
+
         rts
 
 SetUpCustomCharacters
@@ -197,7 +243,7 @@ SetUpCustomCharacters
         rts
 
 ScnLevelOne
-        TEXT "{clear}{white}{down*8}gg{down}bc{down}d{down}h{down}{left}j{down}h{down}{left}j{down}{left}i{down}{left}k{down}{left*2}e{down}{left*3}@a{down}{left*3}e{down}{left*2}e{down}{left}d{down}d{down}d{down}dlllk{up}{left}i"
+        TEXT "{white}{clear}{down*8}gg{down}bc{down}d{down}h{down}{left}j{down}h{down}{left}j{down}{left}i{down}{left}k{down}{left*2}e{down}{left*3}@a{down}{left*3}e{down}{left*2}e{down}{left}d{down}d{down}d{down}dlllk{up}{left}i"
         TEXT "{up}{left}j{up}{left}h{up}{left}e{up}e{up}@a{up}e{up}k{up}{left}i{up}k{up}{left}i{up}lllk{up}{left}i{up}{left}d{up}{left*2}d{up}{left}@a{up}e{up}k{up}{left}i{up}f{down}dgg{down}h{down}{left}j{down}h{down}{left}j"
         TEXT "{down}{left}i{down}{left}k{down}{left}h{down}{left}j{down}h{down}{left}j{down}{left}e{down}{left*2}e{down}{left}h{down}{left}j{down}d{down}bcllllebc{down}bc{down}d"
         BYTE 0
@@ -214,6 +260,8 @@ SetUpGameVariables
         sta Gravity
         sta Thrust
         sta HorizontalInertia
+        lda #False
+        sta CollidedWithBackground
 
         lda #2
         sta GravityFrac
@@ -221,6 +269,11 @@ SetUpGameVariables
         sta ThrustFrac
         lda #2
         sta HorizontalInertiaFrac
+
+        lda #8
+        sta FuelBarValueFrac
+        lda #0
+        sta FuelBarValue
 
         rts
 
@@ -234,6 +287,7 @@ ReadInputAndUpdateVariables
         LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
         ldx #spThrustLeft
         stx ManuoverFrameNo
+        jsr AddFuelConsumption
 
 @TestRight
         LIBINPUT_GETHELD GameportRightMask
@@ -243,6 +297,7 @@ ReadInputAndUpdateVariables
         LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
         ldx #spThrustRight
         stx ManuoverFrameNo
+        jsr AddFuelConsumption
 
 @TestFire
         LIBINPUT_GETHELD GameportFireMask
@@ -253,6 +308,8 @@ ReadInputAndUpdateVariables
         LIBMATH_SUB16BIT_AAA VerticalVelocityFrac, ThrustFrac, VerticalVelocityFrac
         ldx #spThrustDown
         stx ThrustFrameNo
+        jsr AddFuelConsumption
+        jsr AddFuelConsumption
         jmp @GravityByPass
 
 @NoInput
@@ -298,12 +355,38 @@ UpdateSpritePosition
 
 DidWeCollideWithScene
         LIBSPRITE_DIDCOLLIDEWITHDATA_A LunaLanderSpNo
-        beq @DidNotCollide
-        ldx #2
-        stx EXTCOL
+        beq DidNotCollide
+        ;lda #2
+        ;sta EXTCOL
+        lda #True
+        sta CollidedWithBackground
 
-@DidNotCollide
-        clc
-        adc #$30
-        sta $0400
+        LIBSPRITE_SETCOLOR_AV     LunaLanderSpNo, Yellow
+        LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, True
+        LIBSPRITE_PLAYANIM_AVVVV  LunaLanderSpNo, 5, 16, 3, False
+
+DidNotCollide
+        rts
+
+UpdateBarsAndGauges
+        lda VerticalVelocityFrac
+        sta VerticalBarValue
+        lda VerticalVelocity
+        lsr 
+        ror VerticalBarValue
+        lsr 
+        ror VerticalBarValue
+        lsr 
+        ror VerticalBarValue
+        lda VerticalBarValue
+        eor #$FF
+        LIBBARSANDGAUGES_SHOWYBAR_AV $044E, $2C
+
+        lda FuelBarValue
+        LIBBARSANDGAUGES_SHOWYGAUGE_AV $044D, $00
+
+        rts
+
+AddFuelConsumption
+        LIBMATH_ADD16BIT_AAA FuelBarValueFrac, ThrustCostFrac, FuelBarValueFrac
         rts
