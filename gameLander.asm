@@ -77,6 +77,15 @@ DidNotCollide
         rts
 
 glReadInputAndUpdateVariables
+
+        lda FuelBarValue
+        cmp #95
+        bcc @GetInput
+        lda #95
+        sta FuelBarValue
+        jmp @FuelRanOut
+
+@GetInput
         jsr libInputUpdate
 
         LIBINPUT_GETHELD GameportLeftMask
@@ -115,6 +124,7 @@ glReadInputAndUpdateVariables
         LIBINPUT_GETHELD GameportNoInputMask
         cmp #GameportNoInputMask
         bne @InputProcessed
+@FuelRanOut
         ldx #spNoThrust
         stx ThrustFrameNo
         stx ManuoverFrameNo
