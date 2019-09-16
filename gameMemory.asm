@@ -102,6 +102,12 @@ ThrustCost
 GameStatus
         brk
 
+DemoMode
+        BYTE 0
+
+DemoIncrement
+        BYTE 1
+
         ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
 gmSetUpGameVariables
         lda #0

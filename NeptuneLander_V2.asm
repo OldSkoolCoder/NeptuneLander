@@ -49,6 +49,15 @@ GameLoop
         lda GameLoopFrameTracker
         bne GameLooper
 
+        lda DemoMode
+        cmp #255
+        bne @NotInDemoMode
+        jsr glDebugReadInputAndUpdateVariables
+        jsr glUpdateSpritePosition
+        jsr glDidWeCollideWithScene
+        jmp GameDebugByPass
+
+@NotInDemoMode
         lda CollidedWithBackground
         cmp #True
         beq GameLooper
@@ -62,6 +71,7 @@ GameLoop
 GameLooper
         jsr gfUpdateGameFlow
 
+GameDebugByPass
         jsr libSpritesUpdate
 
         lda GameLoopFrameTracker

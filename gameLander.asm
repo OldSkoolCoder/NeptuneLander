@@ -69,11 +69,71 @@ glDidWeCollideWithScene
         lda #True
         sta CollidedWithBackground
 
+        lda DemoMode
+        cmp #255
+        beq DidNotCollide
+
         LIBSPRITE_SETCOLOR_AV     LunaLanderSpNo, Yellow
         LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, True
         LIBSPRITE_PLAYANIM_AVVVV  LunaLanderSpNo, 5, 16, 3, False
 
 DidNotCollide
+        rts
+
+glDebugReadInputAndUpdateVariables
+
+@GetInput
+        jsr libInputUpdate
+
+        LIBINPUT_GETHELD GameportLeftMask
+        bne @TestRight
+
+        LIBMATH_SUB8BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
+
+@TestRight
+        LIBINPUT_GETHELD GameportRightMask
+        bne @TestUp
+
+        LIBMATH_ADD8BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
+
+@TestUp
+        LIBINPUT_GETHELD GameportUpMask
+        bne @TestDown
+
+        LIBMATH_SUB8BIT_AAA LunaLanderY, DemoIncrement, LunaLanderY
+
+@TestDown
+        LIBINPUT_GETHELD GameportDownMask
+        bne @TestFire
+
+        LIBMATH_ADD8BIT_AAA LunaLanderY, DemoIncrement, LunaLanderY
+
+
+@TestFire
+        ;LIBINPUT_GETHELD GameportFireMask
+        ;bne @NoInput
+
+        lda #19
+        jsr krljmp_CHROUT$
+        ldx LunaLanderXLo
+        lda #0
+        jsr $bdcd
+
+        lda #44
+        jsr krljmp_CHROUT$
+
+        ldx LunaLanderY
+        lda #0
+        jsr $bdcd
+
+        lda #44
+        jsr krljmp_CHROUT$
+
+        ldx CollidedWithBackground
+        lda #0
+        jsr $bdcd
+
+@NoInput
         rts
 
 glReadInputAndUpdateVariables
