@@ -48,7 +48,7 @@ glSetUpLunarSprite
 glUpdateSpritePosition
         ; 210 Y = (Y+VV) : X = (X+HV)
         LIBMATH_ADD16BIT_AAA LunaLanderYFrac, VerticalVelocityFrac, LunaLanderYFrac
-        LIBMATH_ADD16BIT_AAA LunaLanderXFrac, HorizontalVelocityFrac, LunaLanderXFrac
+        LIBMATH_ADD24BIT_AAA LunaLanderXFrac, HorizontalVelocityFrac, LunaLanderXFrac
 
         ;215 POKE 2041,TS : POKE 53250, XL : POKE 53251, Y
         ;216 POKE 53249, Y : POKE 53248,XL : POKE 53264, XH : REM CC=CC+1
@@ -88,13 +88,13 @@ glDebugReadInputAndUpdateVariables
         LIBINPUT_GETHELD GameportLeftMask
         bne @TestRight
 
-        LIBMATH_SUB8BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
+        LIBMATH_SUB16BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
 
 @TestRight
         LIBINPUT_GETHELD GameportRightMask
         bne @TestUp
 
-        LIBMATH_ADD8BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
+        LIBMATH_ADD16BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
 
 @TestUp
         LIBINPUT_GETHELD GameportUpMask

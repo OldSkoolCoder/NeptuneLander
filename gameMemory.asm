@@ -69,6 +69,9 @@ HorizontalVelocityFrac
 HorizontalVelocity
         brk
 
+HorizontalVelocityHi
+        brk
+
 HorizontalInertiaFrac
         brk
 
@@ -103,10 +106,13 @@ GameStatus
         brk
 
 DemoMode
-        BYTE 0
+        BYTE 0          ; 0 = Game Mode / 255 = Demo Mode
 
 DemoIncrement
         BYTE 1
+
+DemoIncrementHi
+        brk
 
         ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
 gmSetUpGameVariables

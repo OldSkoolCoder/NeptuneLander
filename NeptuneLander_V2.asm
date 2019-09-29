@@ -40,8 +40,8 @@ GameStart
 GameLoop
         LIBSCREEN_WAIT_V 255
 
-        lda #1
-        sta EXTCOL
+        ;lda #1
+        ;sta EXTCOL
 
         ;LIBSCREEN_DEBUG16BIT_VVAA 1,1,VerticalVelocity, VerticalVelocityFrac
         ;LIBSCREEN_DEBUG8BIT_VVA 8,1,LunaLanderY
@@ -80,8 +80,8 @@ GameDebugByPass
         and FrameSkipRate
         sta GameLoopFrameTracker
 
-        lda #0
-        sta EXTCOL
+        ;lda #0
+        ;sta EXTCOL
 
         jmp GameLoop
         rts
