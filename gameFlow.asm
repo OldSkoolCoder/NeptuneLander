@@ -32,11 +32,32 @@ gfStatusInFlight
     cmp #False
     beq @NotCollided
 
+;    lda LunaLanderXHi
+;    cmp #1
+;    bne @ConfirmCollided
+
+;    lda LunaLanderXLo
+;    cmp #40
+;    bcs @ConfirmYBarStatus
+;    jmp @ConfirmCollided
+
+;@ConfirmYBarStatus
+;    lda LunaLanderY
+;    cmp #155
+;    bcc gfStatusInFlightOK
+;    jmp @ConfirmCollided
+
+@ConfirmCollided
     lda #GF_Dying
     sta GameStatus
 
 @NotCollided
     rts
+
+;gfStatusInFlightOK
+;    lda #False
+;    sta CollidedWithBackground
+;    rts
 
 gfStatusLanded
     rts
