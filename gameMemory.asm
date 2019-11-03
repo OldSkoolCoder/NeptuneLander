@@ -142,7 +142,7 @@ gmSetUpGameVariables
         rts
 
 gmAddFuelConsumption
-        LIBMATH_ADD16BIT_AAA FuelBarValueFrac, ThrustCostFrac, FuelBarValueFrac
+        ;LIBMATH_ADD16BIT_AAA FuelBarValueFrac, ThrustCostFrac, FuelBarValueFrac
         rts
 
 gmSetUpCustomCharacters

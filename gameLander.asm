@@ -1,10 +1,11 @@
 glSetUpLunarSprite
-        lda #250 ;60
+        lda #$10
         sta LunaLanderXLo
-        lda #60
+        lda #100
         sta LunaLanderY
-        lda #0
+        lda #1
         sta LunaLanderXHi
+        lda #0
         sta LunaLanderSpNo
         sta LunaLanderColour
 
@@ -72,36 +73,12 @@ glDidWeCollideWithScene
         cmp #255
         beq DidNotCollide
 
-        ; Test For Bar Safe zone
-        lda LunaLanderXHi
-        cmp #1
-        bne @ConfirmCollided
-
-        lda LunaLanderXLo
-        cmp #40
-        bcs @ConfirmYBarStatus
-        jmp @ConfirmCollided
-
-@ConfirmYBarStatus
-        lda LunaLanderY
-        cmp #155
-        bcc gfStatusInFlightOK
-
 @ConfirmCollided
         lda #True
         sta CollidedWithBackground
 
-        LIBSPRITE_SETCOLOR_AV     LunaLanderSpNo, Yellow
-        LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, True
-        LIBSPRITE_PLAYANIM_AVVVV  LunaLanderSpNo, 5, 16, 3, False
-
 DidNotCollide
         rts
-
-gfStatusInFlightOK
-    lda #False
-    sta CollidedWithBackground
-    rts
 
 glDebugReadInputAndUpdateVariables
 

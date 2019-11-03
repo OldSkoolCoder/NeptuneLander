@@ -24,44 +24,70 @@ gfUpdateGameFlow
 
     jmp (ZeroPageLow)
 
+;***********************************************************************
+; Game Menu Mode
 gfStatusMenu
     rts
 
+;***********************************************************************
+; Normal Flight Mode, check of collision detection
 gfStatusInFlight
+    jsr gfHaveWeSafelyLanded
+    bcc @SoFarNotLanded
+    lda #GF_Landed
+    sta GameStatus
+    
+@SoFarNotLanded
     lda CollidedWithBackground
     cmp #False
-    beq @NotCollided
+    bne @SpriteCollided
+    jmp gfNotCollided
 
-;    lda LunaLanderXHi
-;    cmp #1
-;    bne @ConfirmCollided
+;***********************************************************************
+; Check Lander has not hit the status bars.
+@SpriteCollided
+    lda LunaLanderXHi
+    cmp #1
+    bne @ConfirmCollided
 
-;    lda LunaLanderXLo
-;    cmp #40
-;    bcs @ConfirmYBarStatus
-;    jmp @ConfirmCollided
+    lda LunaLanderXLo
+    cmp #40
+    bcs @ConfirmYBarStatus
+    jmp @ConfirmCollided
 
-;@ConfirmYBarStatus
-;    lda LunaLanderY
-;    cmp #155
-;    bcc gfStatusInFlightOK
-;    jmp @ConfirmCollided
+@ConfirmYBarStatus
+    lda LunaLanderY
+    cmp #155
+    bcc gfStatusInFlightOK
+    ;jmp @ConfirmCollided
 
+;***********************************************************************
+; Confirmation Lander has collided with something
 @ConfirmCollided
     lda #GF_Dying
     sta GameStatus
 
-@NotCollided
+    LIBSPRITE_SETCOLOR_AV     LunaLanderSpNo, Yellow
+    LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, True
+    LIBSPRITE_PLAYANIM_AVVVV  LunaLanderSpNo, 5, 16, 3, False
+
+gfNotCollided
     rts
 
-;gfStatusInFlightOK
-;    lda #False
-;    sta CollidedWithBackground
-;    rts
+;**********************************************************************
+; Flight Is Normnal, collision was a false positive
+gfStatusInFlightOK
+    lda #False
+    sta CollidedWithBackground
+    rts
 
+;**********************************************************************
+; Lander has successfully landed
 gfStatusLanded
-    rts
+    jmp gfStatusDead
 
+;**********************************************************************
+; The Lander is currently dying (explosion animation)
 gfStatusDying
     LIBSPRITE_ISANIMPLAYING_A LunaLanderSpNo
     bne @NotFinishedDying
@@ -72,6 +98,8 @@ gfStatusDying
 @NotFinishedDying
     rts
 
+;**********************************************************************
+; Confirmation of Luna Death.
 gfStatusDead
     jsr libInputUpdate
 
@@ -86,4 +114,32 @@ gfStatusDead
 @NoGameReset
     rts
 
+gfHaveWeSafelyLanded
+    lda LunaLanderXHi
+    cmp #1
+    bne @LanderHasNotLanded
 
+    lda LunaLanderXLo
+    cmp #$08
+    bcs @LandingSecondTest
+    jmp @LanderHasNotLanded
+
+@LandingSecondTest
+    cmp #$11
+    bcc @LandingFirstTest
+    jmp @LanderHasNotLanded
+
+@LandingFirstTest
+    lda LunaLanderY
+    cmp #202
+    bcs @WeHaveLanded
+
+@LanderHasNotLanded
+    clc
+
+@LandingCheckCompleted
+    rts
+
+@WeHaveLanded
+    sec
+    jmp @LandingCheckCompleted
