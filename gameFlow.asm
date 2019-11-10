@@ -115,31 +115,20 @@ gfStatusDead
     rts
 
 gfHaveWeSafelyLanded
-    lda LunaLanderXHi
-    cmp #1
-    bne @LanderHasNotLanded
 
-    lda LunaLanderXLo
-    cmp #$08
-    bcs @LandingSecondTest
-    jmp @LanderHasNotLanded
+    LIBLUNA_CHECKLANDINGSITE_VVV $0108, $0111, $CA
+    bcc @TestSecondLandSite
+    jmp gfWeHaveLanded
+    
+@TestSecondLandSite
+    LIBLUNA_CHECKLANDINGSITE_VVV $008C, $0091, $84
+    bcc @TestThirdLandSite
+    jmp gfWeHaveLanded
 
-@LandingSecondTest
-    cmp #$11
-    bcc @LandingFirstTest
-    jmp @LanderHasNotLanded
+@TestThirdLandSite
+    LIBLUNA_CHECKLANDINGSITE_VVV $003F, $0042, $E4
+    bcc gfWeHaveLanded          ; Not Landed Legally
+    jmp gfWeHaveLanded
 
-@LandingFirstTest
-    lda LunaLanderY
-    cmp #202
-    bcs @WeHaveLanded
-
-@LanderHasNotLanded
-    clc
-
-@LandingCheckCompleted
+gfWeHaveLanded
     rts
-
-@WeHaveLanded
-    sec
-    jmp @LandingCheckCompleted

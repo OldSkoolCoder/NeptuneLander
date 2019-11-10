@@ -1,9 +1,9 @@
 glSetUpLunarSprite
-        lda #$10
+        lda #64
         sta LunaLanderXLo
-        lda #100
+        lda #195
         sta LunaLanderY
-        lda #1
+        lda #0
         sta LunaLanderXHi
         lda #0
         sta LunaLanderSpNo
