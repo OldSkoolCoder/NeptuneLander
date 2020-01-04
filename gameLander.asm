@@ -1,7 +1,7 @@
 glSetUpLunarSprite
-        lda #64
+        lda #60
         sta LunaLanderXLo
-        lda #195
+        lda #60
         sta LunaLanderY
         lda #0
         sta LunaLanderXHi
@@ -49,8 +49,8 @@ glSetUpLunarSprite
 
 glUpdateSpritePosition
         ; 210 Y = (Y+VV) : X = (X+HV)
-        LIBMATH_ADD16BIT_AAA LunaLanderYFrac, VerticalVelocityFrac, LunaLanderYFrac
-        LIBMATH_ADD24BIT_AAA LunaLanderXFrac, HorizontalVelocityFrac, LunaLanderXFrac
+        LIBMATH_ADD24BIT_AAA LunaLanderYFracLo, VerticalVelocityFracLo, LunaLanderYFracLo
+        LIBMATH_ADD32BIT_AAA LunaLanderXFracLo, HorizontalVelocityFracLo, LunaLanderXFracLo
 
         ;215 POKE 2041,TS : POKE 53250, XL : POKE 53251, Y
         ;216 POKE 53249, Y : POKE 53248,XL : POKE 53264, XH : REM CC=CC+1
@@ -143,9 +143,9 @@ glDebugReadInputAndUpdateVariables
 glReadInputAndUpdateVariables
 
         lda FuelBarValue
-        cmp #95
+        cmp FuelTankSize
         bcc @GetInput
-        lda #95
+        lda FuelTankSize
         sta FuelBarValue
         jmp @FuelRanOut
 
@@ -156,7 +156,7 @@ glReadInputAndUpdateVariables
         bne @TestRight
 
         ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
-        LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        LIBMATH_ADD24BIT_AAA HorizontalVelocityFracLo, HorizontalInertiaFracLo, HorizontalVelocityFracLo
         ldx #spThrustLeft
         stx ManuoverFrameNo
         jsr gmAddFuelConsumption
@@ -166,7 +166,7 @@ glReadInputAndUpdateVariables
         bne @TestFire
 
         ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
-        LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        LIBMATH_SUB24BIT_AAA HorizontalVelocityFracLo, HorizontalInertiaFracLo, HorizontalVelocityFracLo
         ldx #spThrustRight
         stx ManuoverFrameNo
         jsr gmAddFuelConsumption
@@ -177,7 +177,7 @@ glReadInputAndUpdateVariables
 
         ;110 IF A = 22 THEN VV = VV - T : TS=183 : 
 @FireDetected
-        LIBMATH_SUB16BIT_AAA VerticalVelocityFrac, ThrustFrac, VerticalVelocityFrac
+        LIBMATH_SUB24BIT_AAA VerticalVelocityFracLo, ThrustFracLo, VerticalVelocityFracLo
         ldx #spThrustDown
         stx ThrustFrameNo
         jsr gmAddFuelConsumption
@@ -195,7 +195,7 @@ glReadInputAndUpdateVariables
 
         ;200 VV = VV + G : IF VV > 2 THEN VV = 2
 @InputProcessed
-        LIBMATH_ADD16BIT_AAA VerticalVelocityFrac, GravityFrac, VerticalVelocityFrac
+        LIBMATH_ADD24BIT_AAA VerticalVelocityFracLo, GravityFracLo, VerticalVelocityFracLo
 
 @GravityByPass
         lda VerticalVelocity
@@ -205,7 +205,8 @@ glReadInputAndUpdateVariables
         lda #1
         sta VerticalVelocity
         lda #0
-        sta VerticalVelocityFrac
+        sta VerticalVelocityFracLo
+        sta VerticalVelocityFracHi
 
 @InputFinish
         rts

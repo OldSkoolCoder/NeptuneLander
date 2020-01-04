@@ -32,10 +32,12 @@ incasm "gameBars.asm"
 incasm "gameFlow.asm"
 
 GameStart
-        jsr SetUpLevelOneScene
+        ;jsr SetUpLevelOneScene
+        ldx #0 ; Level 1
+        ldy #1 ; Normal / Easy Difficulty
+        jsr gmSetUpGameVariables
         jsr glSetUpLunarSprite
         jsr gmSetUpCustomCharacters
-        jsr gmSetUpGameVariables
         jsr gbSetUpFuelAndSpeedBars
 
 GameLoop
@@ -47,8 +49,8 @@ GameLoop
         ;LIBSCREEN_DEBUG16BIT_VVAA 1,1,VerticalVelocity, VerticalVelocityFrac
         ;LIBSCREEN_DEBUG8BIT_VVA 8,1,LunaLanderY
 
-        lda GameLoopFrameTracker
-        bne GameLooper
+        ;lda GameLoopFrameTracker
+        ;bne GameLooper
 
         lda DemoMode
         cmp #255
@@ -75,11 +77,11 @@ GameLooper
 GameDebugByPass
         jsr libSpritesUpdate
 
-        lda GameLoopFrameTracker
-        clc
-        adc #$01
-        and FrameSkipRate
-        sta GameLoopFrameTracker
+        ;lda GameLoopFrameTracker
+        ;clc
+        ;adc #$01
+        ;and FrameSkipRate
+        ;sta GameLoopFrameTracker
 
         ;lda #0
         ;sta EXTCOL

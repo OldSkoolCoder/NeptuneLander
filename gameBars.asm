@@ -1,5 +1,5 @@
 gbUpdateBarsAndGauges
-        lda VerticalVelocityFrac
+        lda VerticalVelocityFracHi
         sta VerticalBarValue
         lda VerticalVelocity
         lsr 

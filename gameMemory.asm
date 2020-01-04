@@ -6,7 +6,10 @@
 ;     First Byte is Fraction = 1/128 -> 1/2
 ;     Second Byte is Whole Number
 
-LunaLanderXFrac
+LunaLanderXFracLo
+        brk
+
+LunaLanderXFracHi
         brk
 
 LunaLanderXLo
@@ -15,7 +18,10 @@ LunaLanderXLo
 LunaLanderXHi
         brk
 
-LunaLanderYFrac
+LunaLanderYFracLo
+        brk
+
+LunaLanderYFracHi
         brk
 
 LunaLanderY
@@ -45,25 +51,37 @@ ManuoverFrameNo
 ManuoverColour
         brk
 
-VerticalVelocityFrac
+VerticalVelocityFracLo
         brk
 
+VerticalVelocityFracHi
+
+        brk
 VerticalVelocity
         brk
 
-GravityFrac
+GravityFracLo
+        brk
+
+GravityFracHi
         brk
 
 Gravity
         brk
 
-ThrustFrac
+ThrustFracLo
+        brk
+
+ThrustFracHi
         brk
 
 Thrust
         brk
 
-HorizontalVelocityFrac
+HorizontalVelocityFracLo
+        brk
+
+HorizontalVelocityFracHi
         brk
 
 HorizontalVelocity
@@ -72,7 +90,10 @@ HorizontalVelocity
 HorizontalVelocityHi
         brk
 
-HorizontalInertiaFrac
+HorizontalInertiaFracLo
+        brk
+
+HorizontalInertiaFracHi
         brk
 
 HorizontalInertia
@@ -90,14 +111,20 @@ CollidedWithBackground
 VerticalBarValue
         brk
 
-FuelBarValueFrac
+FuelBarValueFracLo
+        brk
+
+FuelBarValueFracHi
         brk
 
 FuelBarValue
         brk
 
-ThrustCostFrac
-        BYTE 64
+ThrustCostFracLo
+        BYTE 0
+
+ThrustCostFracHi
+        BYTE 8
 
 ThrustCost
         brk
@@ -114,26 +141,232 @@ DemoIncrement
 DemoIncrementHi
         brk
 
+GameLevel
+        byte 0
+
+GameDifficulty
+        byte 0  ; 0 = Easy, 1 = Normal, 2 = Hard
+
+FuelTankSize
+        byte 0
+
+LandingPadOneXStart
+        word 0
+
+LandingPadOneXFinish
+        word 0
+
+LandingPadOneYStart
+        byte 0
+
+LandingPadOneYFinish
+        byte 0
+
+LandingPadTwoXStart
+        word 0
+
+LandingPadTwoXFinish
+        word 0
+
+LandingPadTwoYStart
+        byte 0
+
+LandingPadTwoYFinish
+        byte 0
+
+LandingPadThreeXStart
+        word 0
+
+LandingPadThreeXFinish
+        word 0
+
+LandingPadThreeYStart
+        byte 0
+
+LandingPadThreeYFinish
+        byte 0
+
+LandScapeLocation
+        word 0
+
+
         ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
 gmSetUpGameVariables
-        lda #0
-        sta VerticalVelocity
-        sta HorizontalVelocity
+        ; X = Level, Y = Difficulty
+        ; Get Level Data Location
+
+        stx GameLevel
+        sty GameDifficulty
+
+        txa
+        asl     ; Multiply * 2
+        tax
+
+        lda gmLevelArray,x
+        sta ZeroPageLow
+        lda gmLevelArray + 1,x
+        sta ZeroPageHigh
+
+        ; Get Difiiculty Level Location
+        lda GameDifficulty
+        asl     ; Multiply * 2
+        tay
+
+        lda (ZeroPageLow),y
+        sta ZeroPageLow2
+        iny
+        lda (ZeroPageLow),y
+        sta ZeroPageHigh2
+        
+        ldy #0
+        lda (ZeroPageLow2),y
+        sta GravityFracLo
+        iny
+        lda (ZeroPageLow2),y
+        sta GravityFracHi
+        iny
+        lda (ZeroPageLow2),y
         sta Gravity
+
+        iny
+        lda (ZeroPageLow2),y
+        sta ThrustFracLo
+        iny
+        lda (ZeroPageLow2),y
+        sta ThrustFracHi
+        iny
+        lda (ZeroPageLow2),y
         sta Thrust
+
+        iny
+        lda (ZeroPageLow2),y
+        sta ThrustCostFracLo
+        iny
+        lda (ZeroPageLow2),y
+        sta ThrustCostFracHi
+        iny
+        lda (ZeroPageLow2),y
+        sta ThrustCost
+
+        iny
+        ;lda (ZeroPageLow2),y
+        ;sta ThrustFrac
+        iny
+        ;lda (ZeroPageLow2),y
+        ;sta Thrust
+        iny
+        ;lda (ZeroPageLow2),y
+        ; sta Pad 3 Multiplier
+
+        iny
+        lda (ZeroPageLow2),y
+        sta HorizontalInertiaFracLo
+        iny
+        lda (ZeroPageLow2),y
+        sta HorizontalInertiaFracHi
+        iny
+        lda (ZeroPageLow2),y
         sta HorizontalInertia
-        lda #False
-        sta CollidedWithBackground
 
-        lda #2
-        sta GravityFrac
-        lda #4
-        sta ThrustFrac
-        lda #2
-        sta HorizontalInertiaFrac
+        iny
+        lda (ZeroPageLow2),y
+        sta FuelTankSize
+        
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadOneXStart
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadOneXStart + 1
 
-        lda #8
-        sta FuelBarValueFrac
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadOneXFinish
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadOneXFinish + 1
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadOneYStart
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadOneYFinish
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadTwoXStart
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadTwoXStart + 1
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadTwoXFinish
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadTwoXFinish + 1
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadTwoYStart
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadTwoYFinish
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadThreeXStart
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadThreeXStart + 1
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadThreeXFinish
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadThreeXFinish + 1
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadThreeYStart
+        iny
+        lda (ZeroPageLow2),y
+        sta LandingPadThreeYFinish
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LandScapeLocation
+        iny
+        lda (ZeroPageLow2),y
+        sta LandScapeLocation + 1
+
+        ldy LandScapeLocation + 1
+        lda LandScapeLocation
+        jsr $AB1E
+        ;LIBPRINT_PRINTSTRING_A LandScapeLocation
+
+;        lda #0
+;        sta VerticalVelocity
+;        sta HorizontalVelocity
+;        sta Gravity
+;        sta Thrust
+;        sta HorizontalInertia
+;        lda #False
+;        sta CollidedWithBackground
+
+;        lda #2
+;        sta GravityFrac
+;        lda #4
+;        sta ThrustFrac
+;        lda #2
+;        sta HorizontalInertiaFrac
+
+        lda #0
+        sta FuelBarValueFracLo
+        lda #1
+        sta FuelBarValueFracHi
         lda #0
         sta FuelBarValue
         lda #GF_InFlight
@@ -142,10 +375,103 @@ gmSetUpGameVariables
         rts
 
 gmAddFuelConsumption
-        ;LIBMATH_ADD16BIT_AAA FuelBarValueFrac, ThrustCostFrac, FuelBarValueFrac
+        LIBMATH_ADD24BIT_AAA FuelBarValueFracLo, ThrustCostFracLo, FuelBarValueFracLo
         rts
 
 gmSetUpCustomCharacters
         LIBSCREEN_SETCHARMEMORY 12
         rts
+
+gmLevelArray
+    word gmLevelOneArray
+    ;word gmLevelTwoArray
+    ;word gmLevelThreeArray
+
+gmLevelOneArray
+    word @LevelEasy
+    word @LevelNormal
+    ;word @LevelHard
+
+@LevelEasy
+    byte 0,1,0   ; Gravity FracLo, GravityFracHi, Gravity
+    byte 0,2,0    ; Thrust FracLo, Thrust FracHi Thrust
+    byte 0,8,0    ; ThrustCost FracLo, FracHi, ThrustCost
+    byte 10,5,2   ; Landing Pad Multipliers
+    byte 128,0,0  ; Horizontal Inertia
+    byte 95       ; Fuel Tank Size
+    byte $3F,0    ; Pad One Start X
+    byte $42,0    ; Pad One Finish X
+    byte $E4      ; Pad One Start Y
+    byte $E4      ; Pad One Finish Y
+    byte $8C,0    ; Pad Two Start X
+    byte $91,0    ; Pad Two Finish X
+    byte $84      ; Pad Two Start Y
+    byte $84      ; Pad Two Finish Y
+    byte $08,$01  ; Pad Three Start X
+    byte $11,$01  ; Pad Three Finish X
+    byte $CA      ; Pad Three Start Y
+    byte $CA      ; Pad Three Finish Y
+    word @LevelEasyLandscape
+
+@LevelEasyLandscape
+    TEXT "{white}{clear}{down*8}gg{down}bc{down}d{down}h{down}{left}j{down}h{down}{left}j{down}{left}i{down}{left}k{down}{left*2}e{down}{left*3}@a{down}{left*3}e{down}{left*2}e{down}{left}d{down}d{down}d{down}dlllk{up}{left}i"
+    TEXT "{up}{left}j{up}{left}h{up}{left}e{up}e{up}@a{up}e{up}k{up}{left}i{up}k{up}{left}i{up}lllk{up}{left}i{up}{left}d{up}{left*2}d{up}{left}@a{up}e{up}k{up}{left}i{up}f{down}dgg{down}h{down}{left}j{down}h{down}{left}j"
+    TEXT "{down}{left}i{down}{left}k{down}{left}h{down}{left}j{down}h{down}{left}j{down}{left}e{down}{left*2}e{down}{left}h{down}{left}j{down}d{down}bcllllebc{down}bc{down}d"
+    BYTE 0
+
+@LevelNormal
+    byte 64,0,0   ; Gravity FracLo, GravityFracHi, Gravity
+    byte 0,1,0    ; Thrust FracLo, Thrust FracHi Thrust
+    byte 0,4,0    ; ThrustCost FracLo, FracHi, ThrustCost
+    byte 10,5,2   ; Landing Pad Multipliers
+    byte 128,0,0  ; Horizontal Inertia
+    byte 95       ; Fuel Tank Size
+    byte $3F,0    ; Pad One Start X
+    byte $42,0    ; Pad One Finish X
+    byte $E4      ; Pad One Start Y
+    byte $E4      ; Pad One Finish Y
+    byte $8C,0    ; Pad Two Start X
+    byte $91,0    ; Pad Two Finish X
+    byte $84      ; Pad Two Start Y
+    byte $84      ; Pad Two Finish Y
+    byte $08,$01  ; Pad Three Start X
+    byte $11,$01  ; Pad Three Finish X
+    byte $CA      ; Pad Three Start Y
+    byte $CA      ; Pad Three Finish Y
+    word @LevelNormalLandscape
+
+@LevelNormalLandscape
+    TEXT "{white}{clear}{down*8}gg{down}bc{down}d{down}h{down}{left}j{down}h{down}{left}j{down}{left}i{down}{left}k{down}{left*2}e{down}{left*3}@a{down}{left*3}e{down}{left*2}e{down}{left}d{down}d{down}d{down}dlllk{up}{left}i"
+    TEXT "{up}{left}j{up}{left}h{up}{left}e{up}e{up}@a{up}e{up}k{up}{left}i{up}k{up}{left}i{up}lllk{up}{left}i{up}{left}d{up}{left*2}d{up}{left}@a{up}e{up}k{up}{left}i{up}f{down}dgg{down}h{down}{left}j{down}h{down}{left}j"
+    TEXT "{down}{left}i{down}{left}k{down}{left}h{down}{left}j{down}h{down}{left}j{down}{left}e{down}{left*2}e{down}{left}h{down}{left}j{down}d{down}bcllllebc{down}bc{down}d"
+    BYTE 0
+
+@LevelHard
+    byte 64,0,0   ; Gravity FracLo, GravityFracHi, Gravity
+    byte 0,1,0    ; Thrust FracLo, Thrust FracHi Thrust
+    byte 0,4,0    ; ThrustCost FracLo, FracHi, ThrustCost
+    byte 10,5,2   ; Landing Pad Multipliers
+    byte 128,0,0  ; Horizontal Inertia
+    byte 0      ; Fuel Tank Size
+    byte 0,0    ; Pad One Start X
+    byte 0,0    ; Pad One Finish X
+    byte 0      ; Pad One Start Y
+    byte 0      ; Pad One Finish Y
+    byte 0,0    ; Pad Two Start X
+    byte 0,0    ; Pad Two Finish X
+    byte 0      ; Pad Two Start Y
+    byte 0      ; Pad Two Finish Y
+    byte 0,0    ; Pad Three Start X
+    byte 0,0    ; Pad Three Finish X
+    byte 0      ; Pad Three Start Y
+    byte 0      ; Pad Three Finish Y
+    word @LevelHardLandscape
+
+@LevelHardLandscape
+    TEXT "{white}{clear}{down*8}gg{down}bc{down}d{down}h{down}{left}j{down}h{down}{left}j{down}{left}i{down}{left}k{down}{left*2}e{down}{left*3}@a{down}{left*3}e{down}{left*2}e{down}{left}d{down}d{down}d{down}dlllk{up}{left}i"
+    TEXT "{up}{left}j{up}{left}h{up}{left}e{up}e{up}@a{up}e{up}k{up}{left}i{up}k{up}{left}i{up}lllk{up}{left}i{up}{left}d{up}{left*2}d{up}{left}@a{up}e{up}k{up}{left}i{up}f{down}dgg{down}h{down}{left}j{down}h{down}{left}j"
+    TEXT "{down}{left}i{down}{left}k{down}{left}h{down}{left}j{down}h{down}{left}j{down}{left}e{down}{left*2}e{down}{left}h{down}{left}j{down}d{down}bcllllebc{down}bc{down}d"
+    BYTE 0
+
+
 
