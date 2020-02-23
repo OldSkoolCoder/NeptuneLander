@@ -49,8 +49,8 @@ glSetUpLunarSprite
 
 glUpdateSpritePosition
         ; 210 Y = (Y+VV) : X = (X+HV)
-        LIBMATH_ADD24BIT_AAA LunaLanderYFracLo, VerticalVelocityFracLo, LunaLanderYFracLo
-        LIBMATH_ADD32BIT_AAA LunaLanderXFracLo, HorizontalVelocityFracLo, LunaLanderXFracLo
+        LIBMATH_ADD16BIT_AAA LunaLanderYFrac, VerticalVelocityFracHi, LunaLanderYFrac
+        LIBMATH_ADD24BIT_AAA LunaLanderXFrac, HorizontalVelocityFrac, LunaLanderXFrac
 
         ;215 POKE 2041,TS : POKE 53250, XL : POKE 53251, Y
         ;216 POKE 53249, Y : POKE 53248,XL : POKE 53264, XH : REM CC=CC+1
@@ -156,7 +156,7 @@ glReadInputAndUpdateVariables
         bne @TestRight
 
         ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
-        LIBMATH_ADD24BIT_AAA HorizontalVelocityFracLo, HorizontalInertiaFracLo, HorizontalVelocityFracLo
+        LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
         ldx #spThrustLeft
         stx ManuoverFrameNo
         jsr gmAddFuelConsumption
@@ -166,7 +166,7 @@ glReadInputAndUpdateVariables
         bne @TestFire
 
         ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
-        LIBMATH_SUB24BIT_AAA HorizontalVelocityFracLo, HorizontalInertiaFracLo, HorizontalVelocityFracLo
+        LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
         ldx #spThrustRight
         stx ManuoverFrameNo
         jsr gmAddFuelConsumption

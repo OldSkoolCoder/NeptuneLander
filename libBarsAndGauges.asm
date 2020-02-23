@@ -195,12 +195,12 @@ defm LIBBARSANDGAUGES_SHOWYBAR_AV   ; /1 = Start Screen Location (Address)
     lsr                 ; Divide By 8
     cmp YINDEXPOS
     beq @YPOSSAME
-    pha                 ; Store Away New XINDEXPOS Temporarily
+    pha                 ; Store Away New YINDEXPOS Temporarily
     lda YBARCHARACTERS
     ora #$80
     ldy #0
     sta (YSCRNLOC),y     ; Blank out last location
-    pla                 ; Get back New XINDEXPOS
+    pla                 ; Get back New YINDEXPOS
 @YPOSSAME
     sta YINDEXPOS
     tax
@@ -243,8 +243,12 @@ defm LIBBARSANDGAUGES_SHOWYGAUGE_AV ; /1 = Start Screen Location (Address)
     cmp YGAUGEINDEX     ; Is new location same as old location?
     beq @YSAME           ; Yes, then skip the next instructions
     pha                 ; Store Away New XINDEXPOS Temporarily
+    tay
     lda YGAUGECHARACTERS; Get first character from GAUGE Character Set
-    ;ora #$80
+    cpy YGAUGEINDEX
+    bcs @YGaugeClearFill
+    ora #$80
+@YGaugeClearFill
     ldy #0
     sta (YGAUGLOC),y    ; Blank out last location
     pla                 ; Get back New XINDEXPOS

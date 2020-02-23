@@ -67,6 +67,12 @@ gfStatusInFlight
     lda #GF_Dying
     sta GameStatus
 
+    ldx #spNoThrust
+    stx ThrustFrameNo
+    stx ManuoverFrameNo
+    LIBSPRITE_SETFRAME_AA ThrustSpNo, ThrustFrameNo
+    LIBSPRITE_SETFRAME_AA ManuoverSpNo, ManuoverFrameNo
+
     LIBSPRITE_SETCOLOR_AV     LunaLanderSpNo, Yellow
     LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, True
     LIBSPRITE_PLAYANIM_AVVVV  LunaLanderSpNo, 5, 16, 3, False

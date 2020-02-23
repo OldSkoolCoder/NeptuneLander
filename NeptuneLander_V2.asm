@@ -34,7 +34,7 @@ incasm "gameFlow.asm"
 GameStart
         ;jsr SetUpLevelOneScene
         ldx #0 ; Level 1
-        ldy #1 ; Normal / Easy Difficulty
+        ldy #0 ; Normal=1 / Easy=0 / Hard=2 Difficulty
         jsr gmSetUpGameVariables
         jsr glSetUpLunarSprite
         jsr gmSetUpCustomCharacters
@@ -67,12 +67,13 @@ GameLoop
 
         jsr glReadInputAndUpdateVariables
         jsr glUpdateSpritePosition
-        jsr glDidWeCollideWithScene
+        ;jsr glDidWeCollideWithScene
 
         jsr gbUpdateBarsAndGauges
 
 GameLooper
         jsr gfUpdateGameFlow
+        jsr glDidWeCollideWithScene
 
 GameDebugByPass
         jsr libSpritesUpdate
