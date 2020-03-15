@@ -270,4 +270,68 @@ defm    LIBMATH_SUB24BIT_AAA
         sta /3+2  ; Store sum in MSB of sum
         endm
 
+;==============================================================================
+
+defm    LIBMATH_ADD24BIT2sCOMP_AAA
+                  ; /1 = 1st Number 3 Bytes (Address)
+                  ; /2 = 2nd Number 3 Bytes (Address)
+                  ; /3 = 3rd Number 3 Bytes (Address)
+
+        lda /2+1
+        bmi @Subtract
+
+        ;lda #$30
+        ;sta 1029
+
+        clc       ; Clear carry before first add
+        lda /1    ; Get LSB of first number
+        adc /2    ; Add LSB of second number
+        sta /3    ; Store in LSB of sum
+        lda /1+1  ; Get MSB of first number
+        adc /2+1  ; Add carry and MSB of NUM2
+        sta /3+1  ; Store sum in MSB of sum
+        lda /1+2  ; Get MSB of first number
+        adc /2+2  ; Add carry and MSB of NUM2
+        sta /3+2  ; Store sum in MSB of sum
+        jmp @end
+
+@Subtract
+
+        ;lda #$31
+        ;sta 1029
+
+        clc       ; Clear carry before first add
+        lda /2+2    
+        eor #$FF
+        adc #1
+        sta $02FF
+        ;sta 1030
+
+        clc
+        lda /2+1    
+        eor #$FF
+        ;adc #1
+        sta $02FE
+        ;sta 1031
+
+        clc
+        lda /2    
+        eor #$FF
+        adc #1
+        sta $02FD
+        ;sta 1032
+
+        sec
+        lda /1
+        sbc $02FD
+        sta /3
+        lda /1+1
+        sbc $02FE
+        sta /3+1
+        lda /1+2
+        sbc $02FF
+        sta /3+2
+
+@end
+        endm
 

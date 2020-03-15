@@ -1,5 +1,5 @@
 glSetUpLunarSprite
-        lda #60
+        lda #70
         sta LunaLanderXLo
         lda #60
         sta LunaLanderY
@@ -23,20 +23,24 @@ glSetUpLunarSprite
         LIBSPRITE_SETFRAME_AV LunaLanderSpNo, spLunaLander
         LIBSPRITE_SETFRAME_AV ThrustSpNo, spNoThrust
         LIBSPRITE_SETFRAME_AV ManuoverSpNo, spNoThrust
+        LIBSPRITE_SETFRAME_AV LunaLanderWindowSpNo, spLunaLanderWindows
 
         ;poke 53269,3
         LIBSPRITE_ENABLE_AV LunaLanderSpNo, True
         LIBSPRITE_ENABLE_AV ThrustSpNo, True
         LIBSPRITE_ENABLE_AV ManuoverSpNo, True
+        LIBSPRITE_ENABLE_AV LunaLanderWindowSpNo, True
 
         ; 30 Y = 60 : POKE 53249,Y : POKE 53251,Y
         ; 40 X = 60 : POKE 53248,X : POKE 53250,X
         LIBSPRITE_SETPOSITION_AAAA LunaLanderSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
         LIBSPRITE_SETPOSITION_AAAA ThrustSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
         LIBSPRITE_SETPOSITION_AAAA ManuoverSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
+        LIBSPRITE_SETPOSITION_AAAA LunaLanderWindowSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
 
         ; POKE 53287,0
         LIBSPRITE_SETCOLOR_AA LunaLanderSpNo, LunaLanderColour
+        LIBSPRITE_SETCOLOR_AA LunaLanderWindowSpNo, LunaLanderWindowCol
 
         ; POKE 53288,2
         LIBSPRITE_SETCOLOR_AA ThrustSpNo, ThrustColour
@@ -44,13 +48,15 @@ glSetUpLunarSprite
         LIBSPRITE_SETMULTICOLORS_VV Yellow, LightGray
 
         LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, False
+        LIBSPRITE_MULTICOLORENABLE_AV LunaLanderWindowSpNo, False
 
         rts
 
 glUpdateSpritePosition
         ; 210 Y = (Y+VV) : X = (X+HV)
         LIBMATH_ADD16BIT_AAA LunaLanderYFrac, VerticalVelocityFracHi, LunaLanderYFrac
-        LIBMATH_ADD24BIT_AAA LunaLanderXFrac, HorizontalVelocityFrac, LunaLanderXFrac
+        ;LIBMATH_ADD24BIT_AAA LunaLanderXFrac, HorizontalVelocityFrac, LunaLanderXFrac
+        LIBMATH_ADD24BIT2sCOMP_AAA LunaLanderXFrac, HorizontalVelocityFrac, LunaLanderXFrac
 
         ;215 POKE 2041,TS : POKE 53250, XL : POKE 53251, Y
         ;216 POKE 53249, Y : POKE 53248,XL : POKE 53264, XH : REM CC=CC+1
@@ -60,6 +66,7 @@ glUpdateSpritePosition
         LIBSPRITE_SETPOSITION_AAAA LunaLanderSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
         LIBSPRITE_SETPOSITION_AAAA ThrustSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
         LIBSPRITE_SETPOSITION_AAAA ManuoverSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
+        LIBSPRITE_SETPOSITION_AAAA LunaLanderWindowSpNo, LunaLanderXHi, LunaLanderXLo, LunaLanderY
 
         rts
 

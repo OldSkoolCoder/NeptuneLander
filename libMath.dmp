@@ -1,0 +1,348 @@
+00001  0000             ;===============================================================================
+00002  0001             ; MACROS/SUBROUTINES
+00003  0001             
+00004  0001             DEFM       LIBMATH_ABS_AA  ; /1 = NUMBER (ADDRESS)
+00005  0001                        ; /2 = RESULT (ADDRESS)
+00006  0001                        LDA /1
+00007  0001                        BPL @POSITIVE
+00008  0001                        EOR #$FF        ; INVERT THE BITS
+00009  0001                        STA /2
+00010  0001                        INC /2          ; ADD 1 TO GIVE THE TWO'S COMPLIMENT
+00011  0001                        JMP @DONE
+00012  0001             @POSITIVE
+00013  0001                        STA /2
+00014  0001             @DONE
+00015  0001                        ENDM
+00016  0001             
+00017  0001             ;==============================================================================
+00018  0001             
+00019  0001             DEFM       LIBMATH_ADD8BIT_AAA
+00020  0001                        ; /1 = 1ST NUMBER (ADDRESS)
+00021  0001                        ; /2 = 2ND NUMBER (ADDRESS)
+00022  0001                        ; /3 = SUM (ADDRESS)
+00023  0001                        CLC     ; CLEAR CARRY BEFORE ADD
+00024  0001                        LDA /1  ; GET FIRST NUMBER
+00025  0001                        ADC /2 ; ADD TO SECOND NUMBER
+00026  0001                        STA /3  ; STORE IN SUM
+00027  0001                        ENDM
+00028  0001             
+00029  0001             ;==============================================================================
+00030  0001             
+00031  0001             DEFM       LIBMATH_ADD8BIT_AVA
+00032  0001                        ; /1 = 1ST NUMBER (ADDRESS)
+00033  0001                        ; /2 = 2ND NUMBER (VALUE)
+00034  0001                        ; /3 = SUM (ADDRESS)
+00035  0001                        CLC     ; CLEAR CARRY BEFORE ADD
+00036  0001                        LDA /1  ; GET FIRST NUMBER
+00037  0001                        ADC #/2 ; ADD TO SECOND NUMBER
+00038  0001                        STA /3  ; STORE IN SUM
+00039  0001                        ENDM
+00040  0001             
+00041  0001             ;==============================================================================
+00042  0001             
+00043  0001             DEFM       LIBMATH_ADD16BIT_AAVAAA
+00044  0001                        ; /1 = 1ST NUMBER HIGH BYTE (ADDRESS)
+00045  0001                        ; /2 = 1ST NUMBER LOW BYTE (ADDRESS)
+00046  0001                        ; /3 = 2ND NUMBER HIGH BYTE (VALUE)
+00047  0001                        ; /4 = 2ND NUMBER LOW BYTE (ADDRESS)
+00048  0001                        ; /5 = SUM HIGH BYTE (ADDRESS)
+00049  0001                        ; /6 = SUM LOW BYTE (ADDRESS)
+00050  0001                        CLC     ; CLEAR CARRY BEFORE FIRST ADD
+00051  0001                        LDA /2  ; GET LSB OF FIRST NUMBER
+00052  0001                        ADC /4  ; ADD LSB OF SECOND NUMBER
+00053  0001                        STA /6  ; STORE IN LSB OF SUM
+00054  0001                        LDA /1  ; GET MSB OF FIRST NUMBER
+00055  0001                        ADC #/3 ; ADD CARRY AND MSB OF NUM2
+00056  0001                        STA /5  ; STORE SUM IN MSB OF SUM
+00057  0001                        ENDM
+00058  0001             
+00059  0001             ;==============================================================================
+00060  0001             
+00061  0001             DEFM       LIBMATH_ADD16BIT_AAVVAA
+00062  0001                        ; /1 = 1ST NUMBER HIGH BYTE (ADDRESS)
+00063  0001                        ; /2 = 1ST NUMBER LOW BYTE (ADDRESS)
+00064  0001                        ; /3 = 2ND NUMBER HIGH BYTE (VALUE)
+00065  0001                        ; /4 = 2ND NUMBER LOW BYTE (VALUE)
+00066  0001                        ; /5 = SUM HIGH BYTE (ADDRESS)
+00067  0001                        ; /6 = SUM LOW BYTE (ADDRESS)
+00068  0001                        CLC     ; CLEAR CARRY BEFORE FIRST ADD
+00069  0001                        LDA /2  ; GET LSB OF FIRST NUMBER
+00070  0001                        ADC #/4 ; ADD LSB OF SECOND NUMBER
+00071  0001                        STA /6  ; STORE IN LSB OF SUM
+00072  0001                        LDA /1  ; GET MSB OF FIRST NUMBER
+00073  0001                        ADC #/3 ; ADD CARRY AND MSB OF NUM2
+00074  0001                        STA /5  ; STORE SUM IN MSB OF SUM
+00075  0001                        ENDM
+00076  0001             
+00077  0001             ;==============================================================================
+00078  0001             
+00079  0001             DEFM       LIBMATH_MIN8BIT_AV      ; /1 = NUMBER 1 (ADDRESS)
+00080  0001                        ; /2 = NUMBER 2 (VALUE)
+00081  0001                        
+00082  0001                        LDA #/2                 ; LOAD NUMBER 2
+00083  0001                        CMP /1                  ; COMPARE WITH NUMBER 1
+00084  0001                        BCS @SKIP               ; IF NUMBER 2 >= NUMBER 1 THEN SKIP
+00085  0001                        STA /1                  ; ELSE REPLACE NUMBER1 WITH NUMBER2
+00086  0001             @SKIP
+00087  0001                        ENDM
+00088  0001             
+00089  0001             ;==============================================================================
+00090  0001             
+00091  0001             DEFM       LIBMATH_MAX8BIT_AV      ; /1 = NUMBER 1 (ADDRESS)
+00092  0001                        ; /2 = NUMBER 2 (VALUE)
+00093  0001                        
+00094  0001                        LDA #/2                 ; LOAD NUMBER 2
+00095  0001                        CMP /1                  ; COMPARE WITH NUMBER 1
+00096  0001                        BCC @SKIP               ; IF NUMBER 2 < NUMBER 1 THEN SKIP
+00097  0001                        STA /1                  ; ELSE REPLACE NUMBER1 WITH NUMBER2
+00098  0001             @SKIP
+00099  0001                        ENDM
+00100  0001             
+00101  0001             ;==============================================================================
+00102  0001             
+00103  0001             DEFM       LIBMATH_MIN16BIT_AAVV   ; /1 = NUMBER 1 HIGH (ADDRESS)
+00104  0001                        ; /2 = NUMBER 1 LOW (ADDRESS)
+00105  0001                        ; /3 = NUMBER 2 HIGH (VALUE)
+00106  0001                        ; /4 = NUMBER 2 LOW (VALUE)
+00107  0001                        
+00108  0001                        ; HIGH BYTE
+00109  0001                        LDA /1                  ; LOAD NUMBER 1
+00110  0001                        CMP #/3                 ; COMPARE WITH NUMBER 2
+00111  0001                        BMI @SKIP               ; IF NUMBER 1 < NUMBER 2 THEN SKIP
+00112  0001                        LDA #/3
+00113  0001                        STA /1                  ; ELSE REPLACE NUMBER1 WITH NUMBER2
+00114  0001             
+00115  0001                        ; LOW BYTE
+00116  0001                        LDA #/4                 ; LOAD NUMBER 2
+00117  0001                        CMP /2                  ; COMPARE WITH NUMBER 1
+00118  0001                        BCS @SKIP               ; IF NUMBER 2 >= NUMBER 1 THEN SKIP
+00119  0001                        STA /2                  ; ELSE REPLACE NUMBER1 WITH NUMBER2
+00120  0001             @SKIP
+00121  0001                        ENDM
+00122  0001             
+00123  0001             ;==============================================================================
+00124  0001             
+00125  0001             DEFM       LIBMATH_MAX16BIT_AAVV   ; /1 = NUMBER 1 HIGH (ADDRESS)
+00126  0001                        ; /2 = NUMBER 1 LOW (ADDRESS)
+00127  0001                        ; /3 = NUMBER 2 HIGH (VALUE)
+00128  0001                        ; /4 = NUMBER 2 LOW (VALUE)
+00129  0001                        
+00130  0001                        ; HIGH BYTE
+00131  0001                        LDA #/3                 ; LOAD NUMBER 2
+00132  0001                        CMP /1                  ; COMPARE WITH NUMBER 1
+00133  0001                        BCC @SKIP               ; IF NUMBER 2 < NUMBER 1 THEN SKIP
+00134  0001                        STA /1                  ; ELSE REPLACE NUMBER1 WITH NUMBER2
+00135  0001             
+00136  0001                        ; LOW BYTE
+00137  0001                        LDA #/4                 ; LOAD NUMBER 2
+00138  0001                        CMP /2                  ; COMPARE WITH NUMBER 1
+00139  0001                        BCC @SKIP               ; IF NUMBER 2 < NUMBER 1 THEN SKIP
+00140  0001                        STA /2                  ; ELSE REPLACE NUMBER1 WITH NUMBER2
+00141  0001             
+00142  0001             @SKIP
+00143  0001                        ENDM
+00144  0001             
+00145  0001             ;==============================================================================
+00146  0001             
+00147  0001             DEFM       LIBMATH_SUB8BIT_AAA
+00148  0001                        ; /1 = 1ST NUMBER (ADDRESS)
+00149  0001                        ; /2 = 2ND NUMBER (ADDRESS)
+00150  0001                        ; /3 = SUM (ADDRESS)
+00151  0001                        SEC     ; SEC IS THE SAME AS CLEAR BORROW
+00152  0001                        LDA /1  ; GET FIRST NUMBER
+00153  0001                        SBC /2  ; SUBTRACT SECOND NUMBER
+00154  0001                        STA /3  ; STORE IN SUM
+00155  0001                        ENDM
+00156  0001             
+00157  0001             ;==============================================================================
+00158  0001             
+00159  0001             DEFM       LIBMATH_SUB8BIT_AVA
+00160  0001                        ; /1 = 1ST NUMBER (ADDRESS)
+00161  0001                        ; /2 = 2ND NUMBER (VALUE)
+00162  0001                        ; /3 = SUM (ADDRESS)
+00163  0001                        SEC     ; SEC IS THE SAME AS CLEAR BORROW
+00164  0001                        LDA /1  ; GET FIRST NUMBER
+00165  0001                        SBC #/2 ; SUBTRACT SECOND NUMBER
+00166  0001                        STA /3  ; STORE IN SUM
+00167  0001                        ENDM
+00168  0001             
+00169  0001             ;==============================================================================
+00170  0001             
+00171  0001             DEFM       LIBMATH_SUB16BIT_AAVAAA
+00172  0001                        ; /1 = 1ST NUMBER HIGH BYTE (ADDRESS)
+00173  0001                        ; /2 = 1ST NUMBER LOW BYTE (ADDRESS)
+00174  0001                        ; /3 = 2ND NUMBER HIGH BYTE (VALUE)
+00175  0001                        ; /4 = 2ND NUMBER LOW BYTE (ADDRESS)
+00176  0001                        ; /5 = SUM HIGH BYTE (ADDRESS)
+00177  0001                        ; /6 = SUM LOW BYTE (ADDRESS)
+00178  0001                        SEC     ; SEC IS THE SAME AS CLEAR BORROW
+00179  0001                        LDA /2  ; GET LSB OF FIRST NUMBER
+00180  0001                        SBC /4 ; SUBTRACT LSB OF SECOND NUMBER
+00181  0001                        STA /6  ; STORE IN LSB OF SUM
+00182  0001                        LDA /1  ; GET MSB OF FIRST NUMBER
+00183  0001                        SBC #/3 ; SUBTRACT BORROW AND MSB OF NUM2
+00184  0001                        STA /5  ; STORE SUM IN MSB OF SUM
+00185  0001                        ENDM
+00186  0001             
+00187  0001             ;==============================================================================
+00188  0001             
+00189  0001             DEFM       LIBMATH_SUB16BIT_AAVVAA
+00190  0001                        ; /1 = 1ST NUMBER HIGH BYTE (ADDRESS)
+00191  0001                        ; /2 = 1ST NUMBER LOW BYTE (ADDRESS)
+00192  0001                        ; /3 = 2ND NUMBER HIGH BYTE (VALUE)
+00193  0001                        ; /4 = 2ND NUMBER LOW BYTE (VALUE)
+00194  0001                        ; /5 = SUM HIGH BYTE (ADDRESS)
+00195  0001                        ; /6 = SUM LOW BYTE (ADDRESS)
+00196  0001                        SEC     ; SEC IS THE SAME AS CLEAR BORROW
+00197  0001                        LDA /2  ; GET LSB OF FIRST NUMBER
+00198  0001                        SBC #/4 ; SUBTRACT LSB OF SECOND NUMBER
+00199  0001                        STA /6  ; STORE IN LSB OF SUM
+00200  0001                        LDA /1  ; GET MSB OF FIRST NUMBER
+00201  0001                        SBC #/3 ; SUBTRACT BORROW AND MSB OF NUM2
+00202  0001                        STA /5  ; STORE SUM IN MSB OF SUM
+00203  0001                        ENDM
+00204  0001             
+00205  0001             ;==============================================================================
+00206  0001             
+00207  0001             DEFM       LIBMATH_ADD16BIT_AAA
+00208  0001                        ; /1 = 1ST NUMBER WORD (ADDRESS)
+00209  0001                        ; /2 = 2ND NUMBER WORD (ADDRESS)
+00210  0001                        ; /3 = 3RD NUMBER WORD (ADDRESS)
+00211  0001             
+00212  0001                        CLC       ; CLEAR CARRY BEFORE FIRST ADD
+00213  0001                        LDA /1    ; GET LSB OF FIRST NUMBER
+00214  0001                        ADC /2    ; ADD LSB OF SECOND NUMBER
+00215  0001                        STA /3    ; STORE IN LSB OF SUM
+00216  0001                        LDA /1+1  ; GET MSB OF FIRST NUMBER
+00217  0001                        ADC /2+1  ; ADD CARRY AND MSB OF NUM2
+00218  0001                        STA /3+1  ; STORE SUM IN MSB OF SUM
+00219  0001                        ENDM
+00220  0001             
+00221  0001             ;==============================================================================
+00222  0001             
+00223  0001             DEFM       LIBMATH_SUB16BIT_AAA
+00224  0001                        ; /1 = 1ST NUMBER WORD (ADDRESS)
+00225  0001                        ; /2 = 2ND NUMBER WORD (ADDRESS)
+00226  0001                        ; /3 = 3RD NUMBER WORD (ADDRESS)
+00227  0001                        SEC       ; SEC IS THE SAME AS CLEAR BORROW
+00228  0001                        LDA /1    ; GET LSB OF FIRST NUMBER
+00229  0001                        SBC /2    ; SUBTRACT LSB OF SECOND NUMBER
+00230  0001                        STA /3    ; STORE IN LSB OF SUM
+00231  0001                        LDA /1+1  ; GET MSB OF FIRST NUMBER
+00232  0001                        SBC /2+1  ; SUBTRACT BORROW AND MSB OF NUM2
+00233  0001                        STA /3+1  ; STORE SUM IN MSB OF SUM
+00234  0001                        ENDM
+00235  0001             
+00236  0001             ;==============================================================================
+00237  0001             
+00238  0001             DEFM       LIBMATH_ADD24BIT_AAA
+00239  0001                        ; /1 = 1ST NUMBER 3 BYTES (ADDRESS)
+00240  0001                        ; /2 = 2ND NUMBER 3 BYTES (ADDRESS)
+00241  0001                        ; /3 = 3RD NUMBER 3 BYTES (ADDRESS)
+00242  0001             
+00243  0001                        CLC       ; CLEAR CARRY BEFORE FIRST ADD
+00244  0001                        LDA /1    ; GET LSB OF FIRST NUMBER
+00245  0001                        ADC /2    ; ADD LSB OF SECOND NUMBER
+00246  0001                        STA /3    ; STORE IN LSB OF SUM
+00247  0001                        LDA /1+1  ; GET MSB OF FIRST NUMBER
+00248  0001                        ADC /2+1  ; ADD CARRY AND MSB OF NUM2
+00249  0001                        STA /3+1  ; STORE SUM IN MSB OF SUM
+00250  0001                        LDA /1+2  ; GET MSB OF FIRST NUMBER
+00251  0001                        ADC /2+2  ; ADD CARRY AND MSB OF NUM2
+00252  0001                        STA /3+2  ; STORE SUM IN MSB OF SUM
+00253  0001                        ENDM
+00254  0001             
+00255  0001             ;==============================================================================
+00256  0001             
+00257  0001             DEFM       LIBMATH_SUB24BIT_AAA
+00258  0001                        ; /1 = 1ST NUMBER 3 BYTES (ADDRESS)
+00259  0001                        ; /2 = 2ND NUMBER 3 BYTES (ADDRESS)
+00260  0001                        ; /3 = 3RD NUMBER 3 BYTES (ADDRESS)
+00261  0001                        SEC       ; SEC IS THE SAME AS CLEAR BORROW
+00262  0001                        LDA /1    ; GET LSB OF FIRST NUMBER
+00263  0001                        SBC /2    ; SUBTRACT LSB OF SECOND NUMBER
+00264  0001                        STA /3    ; STORE IN LSB OF SUM
+00265  0001                        LDA /1+1  ; GET MSB OF FIRST NUMBER
+00266  0001                        SBC /2+1  ; SUBTRACT BORROW AND MSB OF NUM2
+00267  0001                        STA /3+1  ; STORE SUM IN MSB OF SUM
+00268  0001                        LDA /1+2  ; GET MSB OF FIRST NUMBER
+00269  0001                        SBC /2+2  ; SUBTRACT BORROW AND MSB OF NUM2
+00270  0001                        STA /3+2  ; STORE SUM IN MSB OF SUM
+00271  0001                        ENDM
+00272  0001             
+00273  0001             ;==============================================================================
+00274  0001             
+00275  0001             DEFM       LIBMATH_ADD24BIT2SCOMP_AAA
+00276  0001                        ; /1 = 1ST NUMBER 3 BYTES (ADDRESS)
+00277  0001                        ; /2 = 2ND NUMBER 3 BYTES (ADDRESS)
+00278  0001                        ; /3 = 3RD NUMBER 3 BYTES (ADDRESS)
+00279  0001             
+00280  0001                        LDA /2+1
+00281  0001                        BMI @SUBTRACT
+00282  0001             
+00283  0001                        LDA #$30
+00284  0001                        STA 1029
+00285  0001             
+00286  0001                        CLC       ; CLEAR CARRY BEFORE FIRST ADD
+00287  0001                        LDA /1    ; GET LSB OF FIRST NUMBER
+00288  0001                        ADC /2    ; ADD LSB OF SECOND NUMBER
+00289  0001                        STA /3    ; STORE IN LSB OF SUM
+00290  0001                        LDA /1+1  ; GET MSB OF FIRST NUMBER
+00291  0001                        ADC /2+1  ; ADD CARRY AND MSB OF NUM2
+00292  0001                        STA /3+1  ; STORE SUM IN MSB OF SUM
+00293  0001                        LDA /1+2  ; GET MSB OF FIRST NUMBER
+00294  0001                        ADC /2+2  ; ADD CARRY AND MSB OF NUM2
+00295  0001                        STA /3+2  ; STORE SUM IN MSB OF SUM
+00296  0001                        JMP @END
+00297  0001             
+00298  0001             @SUBTRACT
+00299  0001             
+00300  0001                        LDA #$31
+00301  0001                        STA 1029
+00302  0001             
+00303  0001                        CLC       ; CLEAR CARRY BEFORE FIRST ADD
+00304  0001                        LDA /2+2
+00305  0001                        EOR #$FF
+00306  0001                        ADC #1
+00307  0001                        STA $02FF
+00308  0001                        STA 1030
+00309  0001             
+00310  0001                        CLC
+00311  0001                        LDA /2+1
+00312  0001                        EOR #$FF
+00313  0001                        ;ADC #1
+00314  0001                        STA $02FE
+00315  0001                        STA 1031
+00316  0001             
+00317  0001                        CLC
+00318  0001                        LDA /2
+00319  0001                        EOR #$FF
+00320  0001                        ADC #1
+00321  0001                        STA $02FD
+00322  0001                        STA 1032
+00323  0001             
+00324  0001                        SEC
+00325  0001                        LDA /1
+00326  0001                        SBC $02FD
+00327  0001                        STA /3
+00328  0001                        LDA /1+1
+00329  0001                        SBC $02FE
+00330  0001                        STA /3+1
+00331  0001                        LDA /1+2
+00332  0001                        SBC $02FF
+00333  0001                        STA /3+2
+00334  0001             
+00335  0001             @END
+00336  0001                        ENDM
+00337  0001             
+00338  0001             
+
+******* 0 Label(s) *******
+
+******* 0 Unused label(s) *******
+
+******* 1 Variable(s) *******
+tgt_c64  = $0001
+******* 1 Unused variables(s) *******
+tgt_c64
+

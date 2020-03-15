@@ -3,7 +3,7 @@
 
 defm    LIBLUNA_CHECKLANDINGSITE_VVV   ; /1 = XLower (16 Bit Value)
                                        ; /2 = XUpper (16 Bit Value)
-                                       ; /3 = Y (8 Bit Value)
+                                       ; /3 = YUpper (8 Bit Value)
 
                                        ; Result = Carry Set = Success,
                                        ;          Carry Clear = Dead

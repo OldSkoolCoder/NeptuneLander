@@ -38,6 +38,7 @@ gfStatusInFlight
     sta GameStatus
     
 @SoFarNotLanded
+    jsr glDidWeCollideWithScene
     lda CollidedWithBackground
     cmp #False
     bne @SpriteCollided
@@ -72,6 +73,7 @@ gfStatusInFlight
     stx ManuoverFrameNo
     LIBSPRITE_SETFRAME_AA ThrustSpNo, ThrustFrameNo
     LIBSPRITE_SETFRAME_AA ManuoverSpNo, ManuoverFrameNo
+    LIBSPRITE_SETFRAME_AA LunaLanderWindowSpNo, ThrustFrameNo
 
     LIBSPRITE_SETCOLOR_AV     LunaLanderSpNo, Yellow
     LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, True
@@ -90,7 +92,7 @@ gfStatusInFlightOK
 ;**********************************************************************
 ; Lander has successfully landed
 gfStatusLanded
-    jmp gfStatusDead
+    jmp gfStatusLanded
 
 ;**********************************************************************
 ; The Lander is currently dying (explosion animation)
@@ -124,6 +126,18 @@ gfStatusDead
     rts
 
 gfHaveWeSafelyLanded
+;        lda LunaLanderXHi
+;        clc
+;        adc #$30
+;        sta 1024
+;        ldx LunaLanderXLo
+;        stx 1025
+;        ldx HorizontalVelocityHi
+;        stx 1028
+;        ldx HorizontalVelocity
+;        stx 1027
+;        ldx HorizontalVelocityFrac
+;        stx 1026
 
     ;LIBLUNA_CHECKLANDINGSITE_VVV $0108, $0111, $CA
     LIBLUNA_CHECKLANDINGSITE_AAA LandingPadThreeXStart, LandingPadThreeXFinish, LandingPadThreeYStart

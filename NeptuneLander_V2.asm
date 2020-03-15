@@ -10,6 +10,7 @@
 ; Load Sprites 1-> 5 padded to 64 bytes
 incbin "NeptuneLander.spt", 1, 6 ,true
 incbin "DereksExplosions.spt", 5, 16, true
+incbin "NeptuneLanderExtended.spt", 1, 1, true
 
 ; CharacterSet
 *=$3000
@@ -73,7 +74,7 @@ GameLoop
 
 GameLooper
         jsr gfUpdateGameFlow
-        jsr glDidWeCollideWithScene
+        ;jsr glDidWeCollideWithScene
 
 GameDebugByPass
         jsr libSpritesUpdate

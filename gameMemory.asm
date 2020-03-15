@@ -171,6 +171,11 @@ LandingPadThreeYFinish
 LandScapeLocation
         word 0
 
+LunaLanderWindowSpNo
+        byte 3
+
+LunaLanderWindowCol
+        byte 1
 
         ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
 gmSetUpGameVariables
@@ -395,8 +400,8 @@ gmLevelOneArray
     byte $84      ; Pad Two Finish Y
     byte $08,$01    ; Pad Three Start X
     byte $11,$01    ; Pad Three Finish X
-    byte $CA      ; Pad Three Start Y
-    byte $CA      ; Pad Three Finish Y
+    byte $CC      ; Pad Three Start Y
+    byte $CC      ; Pad Three Finish Y
     word @LevelEasyLandscape
 
 @LevelEasyLandscape
@@ -422,8 +427,8 @@ gmLevelOneArray
     byte $84      ; Pad Two Finish Y
     byte $08,$01    ; Pad Three Start X
     byte $11,$01    ; Pad Three Finish X
-    byte $CA      ; Pad Three Start Y
-    byte $CA      ; Pad Three Finish Y
+    byte $CC      ; Pad Three Start Y
+    byte $CC      ; Pad Three Finish Y
     word @LevelNormalLandscape
 
 @LevelNormalLandscape
