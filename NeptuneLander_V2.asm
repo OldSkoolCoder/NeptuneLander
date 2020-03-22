@@ -19,6 +19,7 @@ incbin "LandScape.cst", 0, 255
 *=$0820
         jmp GameStart
 
+*=$4000
 incasm "libSprite.asm"
 incasm "libMath.asm"
 incasm "libInput.asm"
@@ -33,6 +34,7 @@ incasm "gameBars.asm"
 incasm "gameFlow.asm"
 
 GameStart
+        jsr SetUpSIDPlayer
         ;jsr SetUpLevelOneScene
         ldx #0 ; Level 1
         ldy #0 ; Normal=1 / Easy=0 / Hard=2 Difficulty
@@ -42,7 +44,7 @@ GameStart
         jsr gbSetUpFuelAndSpeedBars
 
 GameLoop
-        LIBSCREEN_WAIT_V 255
+        ;LIBSCREEN_WAIT_V 255
 
         ;lda #1
         ;sta EXTCOL
@@ -101,4 +103,5 @@ SetUpLevelOneScene
         LIBPRINT_PRINTSTRING_A ScnLevelOne
         rts
         
+incasm "incSIDPlayer.asm"
 

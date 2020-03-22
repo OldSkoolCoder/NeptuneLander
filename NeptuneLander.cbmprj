@@ -51,6 +51,7 @@
         <FileName>gameFlow.asm</FileName>
         <FileName>gameBars.asm</FileName>
         <FileName>libLuna.asm</FileName>
+        <FileName>incSIDPlayer.asm</FileName>
     </BuildList>
     <DetermineBuildOrder>0</DetermineBuildOrder>
     <PaddingByte>0</PaddingByte>
@@ -113,6 +114,17 @@
         </SourceFile>
         <SourceFile>
             <Name>gameMemory.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>True</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>incSIDPlayer.asm</Name>
             <PrgName />
             <FileType>2</FileType>
             <IncludeInBuild>True</IncludeInBuild>
