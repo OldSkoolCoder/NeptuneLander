@@ -28,11 +28,16 @@ Enjoy
 * Episode 018 : Adding Difficulty Levels Part 1
 * Episode 019 : Adding Difficulty Levels Part 2
 * Episode 019b: Adding Difficulty Levels Part 3
-
-## Episodes To Come
 * Episode 020 : Users Feedback so far Part 1
 * Episode 021 : Tidy Up and Fix things   
 * Episode 022 : Fixing the Landing Checks Again
 * Episode 023 : Adding Background Music
-* Episode 026 : Adding Scoring System
-* Episode 027 : Adding Scoring System Pt 2
+* Episode 024 : Adding Scoring System
+* Episode 025 : Adding Scoring System Pt 2
+
+## Episodes To Come
+* Episode 026 : Examining a Patreons Version, and possible pilphering
+* Episode 027 : Adding Title Screen and Reconfiguration of Game Flow
+* Episode 028 : Adding Speed Test on Landing
+* Episode 029 : Making Landscape more realistic
+
