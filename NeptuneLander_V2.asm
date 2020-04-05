@@ -28,6 +28,7 @@ incasm "libScreen.asm"
 incasm "libPrint.asm"
 incasm "libBarsAndGauges.asm"
 incasm "libLuna.asm"
+incasm "libScoringSystem.asm"
 incasm "gameMemory.asm"
 incasm "gameLander.asm"
 incasm "gameBars.asm"
@@ -42,9 +43,10 @@ GameStart
         jsr glSetUpLunarSprite
         jsr gmSetUpCustomCharacters
         jsr gbSetUpFuelAndSpeedBars
+        jsr gmSetUpScoringDisplay
 
 GameLoop
-        ;LIBSCREEN_WAIT_V 255
+        LIBSCREEN_WAIT_V 255
 
         ;lda #1
         ;sta EXTCOL

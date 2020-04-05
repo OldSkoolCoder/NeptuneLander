@@ -142,3 +142,7 @@ GF_Dying         = 3
 GF_Dead          = 4
 GF_Menu          = 0
 
+scDisplayScoringLocationH = $07D4
+scDisplayScoringLocationM = $07D6
+scDisplayScoringLocationL = $07D8
+

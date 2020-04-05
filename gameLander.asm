@@ -202,6 +202,9 @@ glReadInputAndUpdateVariables
 
         ;200 VV = VV + G : IF VV > 2 THEN VV = 2
 @InputProcessed
+        ldx GameStatus
+        cpx #GF_Dead
+        beq @GravityByPass
         LIBMATH_ADD24BIT_AAA VerticalVelocityFracLo, GravityFracLo, VerticalVelocityFracLo
 
 @GravityByPass

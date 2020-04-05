@@ -177,6 +177,28 @@ LunaLanderWindowSpNo
 LunaLanderWindowCol
         byte 1
 
+ScoreMultiplierPad1
+        byte 0
+
+ScoreMultiplierPad2
+        byte 0
+
+ScoreMultiplierPad3
+        byte 0
+
+ScoreBoard
+        byte 0
+
+ScoreBoardThousands
+        byte 0
+
+ScoreBoardHundredThousands
+        byte 0
+
+LandingPadNumber
+        byte 0
+
+
         ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
 gmSetUpGameVariables
         ; X = Level, Y = Difficulty
@@ -233,14 +255,14 @@ gmSetUpGameVariables
         sta ThrustCost
 
         iny
-        ;lda (ZeroPageLow2),y
-        ;sta ThrustFrac
+        lda (ZeroPageLow2),y
+        sta ScoreMultiplierPad1
         iny
-        ;lda (ZeroPageLow2),y
-        ;sta Thrust
+        lda (ZeroPageLow2),y
+        sta ScoreMultiplierPad2
         iny
-        ;lda (ZeroPageLow2),y
-        ; sta Pad 3 Multiplier
+        lda (ZeroPageLow2),y
+        sta ScoreMultiplierPad3
 
         iny
         lda (ZeroPageLow2),y
@@ -360,8 +382,10 @@ gmSetUpGameVariables
         sta HorizontalVelocityFrac
         sta HorizontalVelocity
         sta HorizontalVelocityHi
-
-
+        sta ScoreBoard
+        sta ScoreBoard + 1
+        sta ScoreBoard + 2
+        sta LandingPadNumber
 
         rts
 
@@ -371,6 +395,13 @@ gmAddFuelConsumption
 
 gmSetUpCustomCharacters
         LIBSCREEN_SETCHARMEMORY 12
+        rts
+
+gmSetUpScoringDisplay
+        ;LIBSCORING_DISPLAYSCORE_AA ScoreBoard, scDisplayScoringLocation
+        LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 2, scDisplayScoringLocationH
+        LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 1, scDisplayScoringLocationM
+        LIBSCORING_DISPLAYSCORESET_AA ScoreBoard, scDisplayScoringLocationL
         rts
 
 gmLevelArray

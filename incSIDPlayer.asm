@@ -14,9 +14,7 @@ SetUpSIDPlayer
     sta $d01a
     sta $d019 ; ACK any raster IRQs
     lda #$00
-    ;jsr $C810 ;Deflektor
-    jsr $1D00 ; Dark Tower Init
-    ;jsr $3003 ; MDG Init
+    jsr $1000
     cli
 
 hold
@@ -29,14 +27,8 @@ hold
 irq
     lda #$01
     sta $d019 ; ACK any raster IRQs
-    jsr $1B85 ;Dark Town Play
-    ;jsr $C106 ;Deflektor
-    ;jsr $3000   ; Play MDG
+    jsr $1003
     jmp $ea31
 
-;*=$C000
-;*=$3000 ;MDG
-* = $1000 ; Dark Tower
-;incbin "deflektor.sid.prg", $7E
-;incbin "mdg radwar.prg", $7E
-incbin "dark_tower.sid.prg", $7E
+* = $1000 ; Dark Tower & Acid Mix
+incbin "Acid_Mix.sid", $7E

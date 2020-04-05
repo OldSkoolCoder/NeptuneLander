@@ -34,6 +34,7 @@ gfStatusMenu
 gfStatusInFlight
     jsr gfHaveWeSafelyLanded
     bcc @SoFarNotLanded
+    stx LandingPadNumber
     lda #GF_Landed
     sta GameStatus
     
@@ -92,7 +93,38 @@ gfStatusInFlightOK
 ;**********************************************************************
 ; Lander has successfully landed
 gfStatusLanded
-    jmp gfStatusLanded
+    lda #0
+    sta LunaLanderXFrac
+    sta LunaLanderYFrac
+    sta VerticalVelocityFracLo
+    sta VerticalVelocityFracHi
+    sta VerticalVelocity
+    sta HorizontalVelocityFrac
+    sta HorizontalVelocity
+    sta HorizontalVelocityHi
+
+    ldx LandingPadNumber
+    dex
+    lda ScoreMultiplierPad1,x 
+    sta ZeroPageParam9      ; Scoring Multiplier
+
+@FuelScoreLoop
+    ;jsr gmAddFuelConsumption
+    inc FuelBarValue
+    lda FuelBarValue
+    cmp FuelTankSize
+    bcs @TankEmpty
+    LIBSCORING_ADDSCORE_AA ZeroPageParam9, ScoreBoard
+    jsr gbUpdateBarsAndGauges
+    jsr gmSetUpScoringDisplay
+    rts
+    
+@TankEmpty
+    lda #GF_Dead
+    sta GameStatus
+    rts
+    ;jmp @TankEmpty
+    
 
 ;**********************************************************************
 ; The Lander is currently dying (explosion animation)
@@ -126,6 +158,8 @@ gfStatusDead
     rts
 
 gfHaveWeSafelyLanded
+;   Output X Reg = Landing Zone
+
 ;        lda LunaLanderXHi
 ;        clc
 ;        adc #$30
@@ -139,21 +173,25 @@ gfHaveWeSafelyLanded
 ;        ldx HorizontalVelocityFrac
 ;        stx 1026
 
+    ldx #$00
     ;LIBLUNA_CHECKLANDINGSITE_VVV $0108, $0111, $CA
     LIBLUNA_CHECKLANDINGSITE_AAA LandingPadThreeXStart, LandingPadThreeXFinish, LandingPadThreeYStart
     bcc @TestSecondLandSite
+    ldx #$03
     jmp gfWeHaveLanded
     
 @TestSecondLandSite
     ;LIBLUNA_CHECKLANDINGSITE_VVV $008C, $0091, $84
     LIBLUNA_CHECKLANDINGSITE_AAA LandingPadTwoXStart, LandingPadTwoXFinish, LandingPadTwoYStart
     bcc @TestThirdLandSite
+    ldx #$02
     jmp gfWeHaveLanded
 
 @TestThirdLandSite
     ;LIBLUNA_CHECKLANDINGSITE_VVV $003F, $0042, $E4
     LIBLUNA_CHECKLANDINGSITE_AAA LandingPadOneXStart, LandingPadOneXFinish, LandingPadOneYStart
     bcc gfWeHaveLanded          ; Not Landed Legally
+    ldx #$01
     jmp gfWeHaveLanded
 
 gfWeHaveLanded
