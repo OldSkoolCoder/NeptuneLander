@@ -34,10 +34,14 @@ Enjoy
 * Episode 023 : Adding Background Music
 * Episode 024 : Adding Scoring System
 * Episode 025 : Adding Scoring System Pt 2
-
-## Episodes To Come
 * Episode 026 : Examining a Patreons Version, and possible pilphering
 * Episode 027 : Adding Title Screen and Reconfiguration of Game Flow
+
+## Episodes To Come
 * Episode 028 : Adding Speed Test on Landing
 * Episode 029 : Making Landscape more realistic
+* Episode 030 : Different Maps for Different Levels
+* Episode 031 : Optimising Levelling and Difficulty
+* Episode 032 : Adding New Levels
+* Episode 033 : Adding Difficulty Selection
 
