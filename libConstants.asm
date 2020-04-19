@@ -45,6 +45,7 @@ SPRITERAM       = 170
 SP0X            = $D000
 SP0Y            = $D001
 MSIGX           = $D010
+SCROLY          = $D011
 RASTER          = $D012
 SPENA           = $D015
 SCROLX          = $D016
@@ -136,11 +137,15 @@ spThrustLeft    = 4
 spThrustRight   = 3
 spNoThrust      = 5
 
-GF_InFlight      = 1
-GF_Landed        = 2
-GF_Dying         = 3
-GF_Dead          = 4
-GF_Menu          = 0
+GF_InFlight     = 1
+GF_Landed       = 2
+GF_Dying        = 3
+GF_Dead         = 4
+GF_Menu         = 0
+GF_Title        = 5
+GF_Retry        = 6
+GF_NextLevel    = 7
+
 
 scDisplayScoringLocationH = $07D4
 scDisplayScoringLocationM = $07D6

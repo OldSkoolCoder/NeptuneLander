@@ -73,8 +73,10 @@ ColorRAMRowStartHigh ;  COLORRAM + 40*0, 40*1, 40*2 ... 40*24
 
 Operator HiLo
 
-screenColumn      byte 0
-screenScrollXValue byte 0
+screenColumn        byte 0
+screenScrollXValue  byte 0
+screenRow           byte 0
+screenScrollYValue  byte 0
 
 ;===============================================================================
 ; Macros/Subroutines
@@ -557,5 +559,151 @@ defm    LIBSCREEN_WAIT_V        ; /1 = Scanline (Value)
         bne @loop               ; Loop if raster line not reached 255
 
         endm
+
+;==============================================================================
+
+defm    LIBSCREEN_COPYSCREEN    ; /1 MemoryLocation of Screen To Copy
+
+        ldy #0
+@loop
+        lda /1,y
+        sta COLORRAM,y
+        lda /1+250,y
+        sta COLORRAM+250,y
+        lda /1+500,y
+        sta COLORRAM+500,y
+        lda /1+750,y
+        sta COLORRAM+750,y
+
+        lda /1+1000,y
+        sta SCREENRAM,y
+        lda /1+1250,y
+        sta SCREENRAM+250,y
+        lda /1+1500,y
+        sta SCREENRAM+500,y
+        lda /1+1750,y
+        sta SCREENRAM+750,y
+
+        iny
+        cpy #251
+        bne @loop
+        
+        endm
+
+;===============================================================================
+
+;==============================================================================
+
+defm    LIBSCREEN_SCROLLYUP_A          ; /1 = update subroutine (Address)
+
+        dec screenScrollYValue
+        lda screenScrollYValue
+        and #%00000111
+        sta screenScrollYValue
+
+        lda SCROLY
+        and #%11111000
+        ora screenScrollYValue
+        sta SCROLY
+
+        lda screenScrollYValue
+        cmp #7
+        bne @finished
+
+        ; move to next row
+        inc screenRow
+        jsr /1 ; call the passed in function to update the screen rows
+@finished
+
+        endm
+
+;==============================================================================
+
+defm    LIBSCREEN_SCROLLYDOWN_A         ; /1 = update subroutine (Address)
+
+        ;lda #7
+        ;sta $d020
+        inc screenScrollYValue
+        lda screenScrollYValue
+        and #%00000111
+        sta screenScrollYValue
+
+@ScrollScreen
+        lda SCROLY
+        and #%11111000
+        ora screenScrollYValue
+        sta SCROLY
+
+        lda screenScrollYValue
+        cmp #0
+        bne @finished
+
+        ; move to previous row
+        dec screenRow
+        jsr /1 ; call the passed in function to update the screen rows
+
+@finished
+        endm
+
+;==============================================================================
+
+defm    LIBSCREEN_SCROLLYRESET_A         ; /1 = update subroutine (Address)
+
+        lda #0
+        sta screenRow
+        sta screenScrollYValue
+
+        lda SCROLY
+        and #%11111000
+        ora screenScrollYValue
+        sta SCROLY
+
+        jsr /1 ; call the passed in function to update the screen rows
+
+        endm
+
+;==============================================================================
+
+defm    LIBSCREEN_SETSCROLLYVALUE_A     ; /1 = ScrollY value (Address)
+
+        lda SCROLY
+        and #%11111000
+        ora /1
+        sta SCROLY
+
+        endm
+
+;==============================================================================
+
+defm    LIBSCREEN_SETSCROLLYVALUE_V     ; /1 = ScrollY value (Value)
+
+        lda SCROLY
+        and #%11111000
+        ora #/1
+        sta SCROLY
+
+        endm
+
+;==============================================================================
+
+defm    LIBSCREEN_SET24ROWMODE
+
+        lda SCROLY
+        and #%11110111 ; clear bit 3
+        sta SCROLY
+
+        endm
+
+;==============================================================================
+
+defm    LIBSCREEN_SET25ROWMODE
+
+        lda SCROLY
+        ora #%00001000 ; set bit 3
+        sta SCROLY
+
+        endm
+
+;==============================================================================
 
 

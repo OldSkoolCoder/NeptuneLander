@@ -5,6 +5,11 @@
         BYTE $0E, $08, $0A, $00, $9E, $20, $28  
         BYTE $32, $30, $38, $30, $29, $00, $00, $00
 
+*=$0820
+        jmp GameStart
+
+incasm "incSIDPlayer.asm"
+
 ; Sprite Data
 *=$2A80
 ; Load Sprites 1-> 5 padded to 64 bytes
@@ -14,10 +19,11 @@ incbin "NeptuneLanderExtended.spt", 1, 1, true
 
 ; CharacterSet
 *=$3000
-incbin "LandScape.cst", 0, 255
+incbin "SevenUp.cst", 0, 255
 
-*=$0820
-        jmp GameStart
+*=$3800
+SplashScreen
+incbin "Intro2.sdd", 1, 1
 
 *=$4000
 incasm "libSprite.asm"
@@ -35,21 +41,18 @@ incasm "gameBars.asm"
 incasm "gameFlow.asm"
 
 GameStart
-        jsr SetUpSIDPlayer
-        ;jsr SetUpLevelOneScene
+        jsr gmSetUpCustomCharacters
+
         ldx #0 ; Level 1
         ldy #0 ; Normal=1 / Easy=0 / Hard=2 Difficulty
-        jsr gmSetUpGameVariables
-        jsr glSetUpLunarSprite
-        jsr gmSetUpCustomCharacters
-        jsr gbSetUpFuelAndSpeedBars
-        jsr gmSetUpScoringDisplay
+        stx GameLevel
+        sty GameDifficulty
+
+        lda #GF_Title
+        sta GameStatus
 
 GameLoop
         LIBSCREEN_WAIT_V 255
-
-        ;lda #1
-        ;sta EXTCOL
 
         ;LIBSCREEN_DEBUG16BIT_VVAA 1,1,VerticalVelocity, VerticalVelocityFrac
         ;LIBSCREEN_DEBUG8BIT_VVA 8,1,LunaLanderY
@@ -72,38 +75,14 @@ GameLoop
 
         jsr glReadInputAndUpdateVariables
         jsr glUpdateSpritePosition
-        ;jsr glDidWeCollideWithScene
 
         jsr gbUpdateBarsAndGauges
 
 GameLooper
         jsr gfUpdateGameFlow
-        ;jsr glDidWeCollideWithScene
 
 GameDebugByPass
         jsr libSpritesUpdate
 
-        ;lda GameLoopFrameTracker
-        ;clc
-        ;adc #$01
-        ;and FrameSkipRate
-        ;sta GameLoopFrameTracker
-
-        ;lda #0
-        ;sta EXTCOL
-
         jmp GameLoop
-        rts
-
-ScnLevelOne
-        TEXT "{white}{clear}{down*8}gg{down}bc{down}d{down}h{down}{left}j{down}h{down}{left}j{down}{left}i{down}{left}k{down}{left*2}e{down}{left*3}@a{down}{left*3}e{down}{left*2}e{down}{left}d{down}d{down}d{down}dlllk{up}{left}i"
-        TEXT "{up}{left}j{up}{left}h{up}{left}e{up}e{up}@a{up}e{up}k{up}{left}i{up}k{up}{left}i{up}lllk{up}{left}i{up}{left}d{up}{left*2}d{up}{left}@a{up}e{up}k{up}{left}i{up}f{down}dgg{down}h{down}{left}j{down}h{down}{left}j"
-        TEXT "{down}{left}i{down}{left}k{down}{left}h{down}{left}j{down}h{down}{left}j{down}{left}e{down}{left*2}e{down}{left}h{down}{left}j{down}d{down}bcllllebc{down}bc{down}d"
-        BYTE 0
-
-SetUpLevelOneScene
-        LIBPRINT_PRINTSTRING_A ScnLevelOne
-        rts
         
-incasm "incSIDPlayer.asm"
-

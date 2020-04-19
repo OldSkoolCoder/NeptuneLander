@@ -89,3 +89,15 @@ lIUDelayZero
         sta GameportLastFrame
 
         rts
+
+; ==============================================================================
+defm    LIBINPUT_DELAY_V ; no. of y loops
+        ldy #/1
+@loopy
+        ldx #$FF
+@loopx
+        dex
+        bne @loopx
+        dey
+        bne @loopy
+        endm

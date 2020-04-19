@@ -37,22 +37,22 @@
         <PostBuildCommands />
     </BuildEvents>
     <BuildList>
+        <FileName>gameBars.asm</FileName>
+        <FileName>gameFlow.asm</FileName>
+        <FileName>gameLander.asm</FileName>
+        <FileName>gameMemory.asm</FileName>
+        <FileName>incSIDPlayer.asm</FileName>
+        <FileName>libBarsAndGauges.asm</FileName>
         <FileName>libConstants.asm</FileName>
         <FileName>libInput.asm</FileName>
+        <FileName>libLuna.asm</FileName>
         <FileName>libMath.asm</FileName>
         <FileName>libPrint.asm</FileName>
+        <FileName>libScoringSystem.asm</FileName>
         <FileName>libScreen.asm</FileName>
         <FileName>libSprite.asm</FileName>
         <FileName>NeptuneLander_V1.asm</FileName>
-        <FileName>libBarsAndGauges.asm</FileName>
-        <FileName>gameLander.asm</FileName>
         <FileName>NeptuneLander_V2.asm</FileName>
-        <FileName>gameMemory.asm</FileName>
-        <FileName>gameFlow.asm</FileName>
-        <FileName>gameBars.asm</FileName>
-        <FileName>libLuna.asm</FileName>
-        <FileName>incSIDPlayer.asm</FileName>
-        <FileName>libScoringSystem.asm</FileName>
     </BuildList>
     <DetermineBuildOrder>0</DetermineBuildOrder>
     <PaddingByte>0</PaddingByte>
@@ -136,6 +136,28 @@
             <FileOpen>True</FileOpen>
         </SourceFile>
         <SourceFile>
+            <Name>Intro2.sdd</Name>
+            <PrgName />
+            <FileType>9</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>IntroScreen.sdd</Name>
+            <PrgName />
+            <FileType>9</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
             <Name>LandingXRef.bas</Name>
             <PrgName />
             <FileType>1</FileType>
@@ -210,7 +232,7 @@
             <Breakpoints />
             <Bookmarks />
             <Topmost>False</Topmost>
-            <FileOpen>True</FileOpen>
+            <FileOpen>False</FileOpen>
         </SourceFile>
         <SourceFile>
             <Name>libMath.asm</Name>
@@ -221,7 +243,7 @@
             <Breakpoints />
             <Bookmarks />
             <Topmost>False</Topmost>
-            <FileOpen>True</FileOpen>
+            <FileOpen>False</FileOpen>
         </SourceFile>
         <SourceFile>
             <Name>libPrint.asm</Name>
@@ -254,12 +276,23 @@
             <Breakpoints />
             <Bookmarks />
             <Topmost>False</Topmost>
-            <FileOpen>False</FileOpen>
+            <FileOpen>True</FileOpen>
         </SourceFile>
         <SourceFile>
             <Name>libSprite.asm</Name>
             <PrgName />
             <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>Marks.sdd</Name>
+            <PrgName />
+            <FileType>9</FileType>
             <IncludeInBuild>True</IncludeInBuild>
             <Regions />
             <Breakpoints />
@@ -370,6 +403,28 @@
             <Name>NeptuneLanderv6.bas</Name>
             <PrgName />
             <FileType>1</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>NewLandScape.sdd</Name>
+            <PrgName />
+            <FileType>9</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>SevenUp.cst</Name>
+            <PrgName />
+            <FileType>6</FileType>
             <IncludeInBuild>True</IncludeInBuild>
             <Regions />
             <Breakpoints />

@@ -382,9 +382,6 @@ gmSetUpGameVariables
         sta HorizontalVelocityFrac
         sta HorizontalVelocity
         sta HorizontalVelocityHi
-        sta ScoreBoard
-        sta ScoreBoard + 1
-        sta ScoreBoard + 2
         sta LandingPadNumber
 
         rts
@@ -398,11 +395,15 @@ gmSetUpCustomCharacters
         rts
 
 gmSetUpScoringDisplay
-        ;LIBSCORING_DISPLAYSCORE_AA ScoreBoard, scDisplayScoringLocation
-        LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 2, scDisplayScoringLocationH
-        LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 1, scDisplayScoringLocationM
-        LIBSCORING_DISPLAYSCORESET_AA ScoreBoard, scDisplayScoringLocationL
-        rts
+    ldy #>txtCurrentScore
+    lda #<txtCurrentScore
+    jsr $AB1E
+
+    ;LIBSCORING_DISPLAYSCORE_AA ScoreBoard, scDisplayScoringLocation
+    LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 2, scDisplayScoringLocationH
+    LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 1, scDisplayScoringLocationM
+    LIBSCORING_DISPLAYSCORESET_AA ScoreBoard, scDisplayScoringLocationL
+    rts
 
 gmLevelArray
     word gmLevelOneArray
@@ -436,9 +437,9 @@ gmLevelOneArray
     word @LevelEasyLandscape
 
 @LevelEasyLandscape
-    TEXT "{white}{clear}{down*8}gg{down}bc{down}d{down}h{down}{left}j{down}h{down}{left}j{down}{left}i{down}{left}k{down}{left*2}e{down}{left*3}@a{down}{left*3}e{down}{left*2}e{down}{left}d{down}d{down}d{down}dlllk{up}{left}i"
-    TEXT "{up}{left}j{up}{left}h{up}{left}e{up}e{up}@a{up}e{up}k{up}{left}i{up}k{up}{left}i{up}lllk{up}{left}i{up}{left}d{up}{left*2}d{up}{left}@a{up}e{up}k{up}{left}i{up}f{down}dgg{down}h{down}{left}j{down}h{down}{left}j"
-    TEXT "{down}{left}i{down}{left}k{down}{left}h{down}{left}j{down}h{down}{left}j{down}{left}e{down}{left*2}e{down}{left}h{down}{left}j{down}d{down}bcllllebc{down}bc{down}d"
+    TEXT "{white}{clear}{down*8}GG{down}BC{down}D{down}H{down}{left}J{down}H{down}{left}J{down}{left}I{down}{left}K{down}{left*2}E{down}{left*3}{sh asterisk}A{down}{left*3}E{down}{left*2}E{down}{left}D{down}D{down}D{down}DLLLK{up}{left}I"
+    TEXT "{up}{left}J{up}{left}H{up}{left}E{up}E{up}{sh asterisk}A{up}E{up}K{up}{left}I{up}K{up}{left}I{up}LLLK{up}{left}I{up}{left}D{up}{left*2}D{up}{left}{sh asterisk}A{up}E{up}K{up}{left}I{up}F{down}DGG{down}H{down}{left}J{down}H{down}{left}J"
+    TEXT "{down}{left}I{down}{left}K{down}{left}H{down}{left}J{down}H{down}{left}J{down}{left}E{down}{left*2}E{down}{left}H{down}{left}J{down}D{down}BCLLLLEBC{down}BC{down}D"
     BYTE 0
 
 @LevelNormal
@@ -495,5 +496,32 @@ gmLevelOneArray
     TEXT "{down}{left}i{down}{left}k{down}{left}h{down}{left}j{down}h{down}{left}j{down}{left}e{down}{left*2}e{down}{left}h{down}{left}j{down}d{down}bcllllebc{down}bc{down}d"
     BYTE 0
 
+txtCurrentScore
+    text "{home}{down*24}{right*12}{white}score :{up}"
+    byte 0
+
+txtPrepareToLandCaptain
+    text "{home}{down*23}{right*5}{yellow}prepare to land, not much fuel"
+    byte 0
+
+txtHoustonTheEagleHasLanded
+    text "{home}{down*23}{right*6}{yellow}huston, the eagle has landed"
+    byte 0
+
+txtCaptainImAfraidWeDidNotMakeIt
+    text "{home}{down*21}{right*6}{yellow}eagle, come in eagle, eagle!{down*2}{left*27}press fire to start again!"
+    byte 0
+
+txtNeptuneLanderTitle1
+    text "{home}{down*4}{right*4}n{down*2}{left}e{down*2}{left}p{down*2}{left}t{down*2}{left}u{down*2}{left}n{down*2}{left}e{down*2}{left}"
+    byte 0
+
+txtNeptuneLanderTitle2
+    text "{home}{down*5}{right*35}l{down*2}{left}a{down*2}{left}n{down*2}{left}d{down*2}{left}e{down*2}{left}r{down*2}{left}"
+    byte 0
+
+txtNeptuneLanderTitle3
+    text "{home}{down*23}{right*10}{yellow}press fire to start"
+    byte 0
 
 

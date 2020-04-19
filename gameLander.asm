@@ -221,4 +221,9 @@ glReadInputAndUpdateVariables
 @InputFinish
         rts
 
-
+glDisableSprites
+    LIBSPRITE_ENABLE_AV LunaLanderSpNo, False
+    LIBSPRITE_ENABLE_AV ThrustSpNo, False
+    LIBSPRITE_ENABLE_AV ManuoverSpNo, False
+    LIBSPRITE_ENABLE_AV LunaLanderWindowSpNo, False
+    rts
