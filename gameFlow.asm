@@ -40,7 +40,16 @@ gfStatusMenu
 gfStatusInFlight
 
     jsr gfHaveWeSafelyLanded
-    bcc @SoFarNotLanded
+    bcc @SoFarNotLanded             ; clear carry means no successful landing
+
+    lda VerticalBarValue
+    cmp #8
+    bcc @LandedVelocityOK
+    lda #True
+    sta CollidedWithBackground
+    jmp @ConfirmCollided
+
+@LandedVelocityOK
     stx LandingPadNumber
     lda #GF_Landed
     sta GameStatus
@@ -291,7 +300,7 @@ ScrollLooper
     lda #<txtNeptuneLanderTitle3
     jsr $AB1E
 
-    jsr SetUpSIDPlayer
+    ;jsr SetUpSIDPlayer
 
 @ScanAgain
     jsr libInputUpdate
