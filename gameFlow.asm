@@ -1,4 +1,5 @@
-
+;*************************************************************************
+; Jump Table for different Game Modes
 gfStatusJumpTableLo
     BYTE <gfStatusMenu
     BYTE <gfStatusInFlight
@@ -8,6 +9,7 @@ gfStatusJumpTableLo
     BYTE <gfSetUpSplashScreen
     BYTE <gfGameRetry
     BYTE <gfNextLevel
+    BYTE <gfUpdateScore
 
 gfStatusJumpTableHi
     BYTE >gfStatusMenu
@@ -18,17 +20,18 @@ gfStatusJumpTableHi
     BYTE >gfSetUpSplashScreen
     BYTE >gfGameRetry
     BYTE >gfNextLevel
+    BYTE >gfUpdateScore
 
 ;***********************************************************************
 ; Main Status Flow Routing Routine
 gfUpdateGameFlow
-    ldx GameStatus
-    lda gfStatusJumpTableLo,x 
+    ldx GameStatus              ; Load Game Mode
+    lda gfStatusJumpTableLo,x   ; Get Low Jump Vector
     sta ZeroPageLow
-    lda gfStatusJumpTableHi,x
+    lda gfStatusJumpTableHi,x   ; Get Hi Jump Vector
     sta ZeroPageHigh
 
-    jmp (ZeroPageLow)
+    jmp (ZeroPageLow)           ; Jump To Game Mode Routine
 
 ;***********************************************************************
 ; Game Menu Mode
@@ -39,59 +42,76 @@ gfStatusMenu
 ; Normal Flight Mode, check of collision detection
 gfStatusInFlight
 
-    jsr gfHaveWeSafelyLanded
+    lda DemoMode                    ; Load Demo Indicator Flag
+    cmp #255                        ; Demo Mode ?
+    bne @NotInDemoMode              ; No
+                                    ; Yes
+    jsr glDebugReadInputAndUpdateVariables  ; Read Controls and Update
+    jsr glUpdateSpritePosition      ; Update Sprite Position
+    jsr glDidWeCollideWithScene     ; check for screen collision
+    rts                             ; Return to Game Looper Routine
+
+@NotInDemoMode
+    jsr glReadInputAndUpdateVariables   ; Read Controls and Update
+    jsr glUpdateSpritePosition      ; Update Sprites State
+
+    jsr gbUpdateBarsAndGauges       ; Update Gauges and Bars
+
+GameLooper
+    jsr gfHaveWeSafelyLanded        ; check to see if we landed safely
     bcc @SoFarNotLanded             ; clear carry means no successful landing
 
-    lda VerticalBarValue
-    cmp #8
-    bcc @LandedVelocityOK
-    lda #True
-    sta CollidedWithBackground
-    jmp @ConfirmCollided
+    lda VerticalBarValue            ; load vertical velocity
+    cmp #8                          ; withing the green area?
+    bcc @LandedVelocityOK           ; Yes
+    jmp @ConfirmCollided            ; No, we crashed
 
 @LandedVelocityOK
-    stx LandingPadNumber
-    lda #GF_Landed
+    stx LandingPadNumber            ; Record which Landing Pad
+    lda #GF_Landed                  ; Change Game state to "Landed"
     sta GameStatus
+    rts
     
 @SoFarNotLanded
-    jsr glDidWeCollideWithScene
-    lda CollidedWithBackground
+    jsr glDidWeCollideWithScene     ; have we colided with the scenry
+    lda CollidedWithBackground      ; load collision flag
     cmp #False
-    bne @SpriteCollided
-    jmp gfNotCollided
+    bne @SpriteCollided             ; Oh Dear, we crashed
+    ;jmp gfNotCollided
+    rts                             ; No crash
 
 ;***********************************************************************
 ; Check Lander has not hit the status bars.
 @SpriteCollided
-    lda LunaLanderXHi
+    lda LunaLanderXHi               ; have we hit the status bars
     cmp #1
-    bne @ConfirmCollided
+    bne @ConfirmCollided            ; Yes
 
-    lda LunaLanderXLo
+    lda LunaLanderXLo               ; have we hit the status bars
     cmp #40
-    bcs @ConfirmYBarStatus
-    jmp @ConfirmCollided
+    bcs @ConfirmYBarStatus          ; No
+    jmp @ConfirmCollided            ; Yes
 
 @ConfirmYBarStatus
-    lda LunaLanderY
+    lda LunaLanderY                 ; check we are under the bars
     cmp #155
-    bcc gfStatusInFlightOK
-    ;jmp @ConfirmCollided
+    bcc gfStatusInFlightOK          ; Flight is good
+    ;jmp @ConfirmCollided           ; Oh dear, no we are not
 
 ;***********************************************************************
 ; Confirmation Lander has collided with something
 @ConfirmCollided
-    lda #GF_Dying
+    lda #GF_Dying                   ; Set game state to "Dying"
     sta GameStatus
 
-    ldx #spNoThrust
+    ldx #spNoThrust                 ; Reset Thrust Sprites to nothing
     stx ThrustFrameNo
     stx ManuoverFrameNo
     LIBSPRITE_SETFRAME_AA ThrustSpNo, ThrustFrameNo
     LIBSPRITE_SETFRAME_AA ManuoverSpNo, ManuoverFrameNo
     LIBSPRITE_SETFRAME_AA LunaLanderWindowSpNo, ThrustFrameNo
 
+    ; start the animation of the explosion
     LIBSPRITE_SETCOLOR_AV     LunaLanderSpNo, Yellow
     LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, True
     LIBSPRITE_PLAYANIM_AVVVV  LunaLanderSpNo, 5, 16, 3, False
@@ -109,20 +129,20 @@ gfStatusInFlightOK
 ;**********************************************************************
 ; Lander has successfully landed
 gfStatusLanded
-    lda #0
-    sta LunaLanderXFrac
-    sta LunaLanderYFrac
-    sta VerticalVelocityFracLo
-    sta VerticalVelocityFracHi
-    sta VerticalVelocity
-    sta HorizontalVelocityFrac
-    sta HorizontalVelocity
-    sta HorizontalVelocityHi
+    jsr gmResetGameVelocityValues
 
     ldy #>txtHoustonTheEagleHasLanded
     lda #<txtHoustonTheEagleHasLanded
     jsr $AB1E
 
+    lda #GF_UpdateScore
+    sta GameStatus
+    rts
+    ;jmp @TankEmpty
+    
+;**********************************************************************
+; The Lander has landed and now updating score animation
+gfUpdateScore
     ldx LandingPadNumber
     dex
     lda ScoreMultiplierPad1,x 
@@ -139,14 +159,13 @@ gfStatusLanded
     LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 2, scDisplayScoringLocationH
     LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 1, scDisplayScoringLocationM
     LIBSCORING_DISPLAYSCORESET_AA ScoreBoard, scDisplayScoringLocationL
-    rts
+
+    jmp gbUpdateBarsAndGauges
     
 @TankEmpty
     lda #GF_NextLevel
     sta GameStatus
     rts
-    ;jmp @TankEmpty
-    
 
 ;**********************************************************************
 ; The Lander is currently dying (explosion animation)
@@ -267,7 +286,7 @@ gfScrollScreenDown
     lda #24
     sta screenRow
 
-    lda #32
+    lda #50
     sta ScrollLooper + 1
 
 ScrollLooper
@@ -514,8 +533,8 @@ gfGameRetry
     jsr gfPrepareToLanderCaptain
     ldx GameLevel
     ldy GameDifficulty
-    jsr glSetUpLunarSprite
     jsr gmSetUpGameVariables
+    jsr glSetUpLunarSprite
     jsr gbSetUpFuelAndSpeedBars
     lda #0
     sta ScoreBoard

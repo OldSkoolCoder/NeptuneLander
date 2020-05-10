@@ -19,11 +19,13 @@ incbin "NeptuneLanderExtended.spt", 1, 1, true
 
 ; CharacterSet
 *=$3000
-incbin "SevenUp.cst", 0, 255
+incbin "SevenUpV2.cst", 0, 255
 
 *=$3800
 SplashScreen
 incbin "Intro2.sdd", 1, 1
+
+    dcb 32,0
 
 *=$4000
 incasm "libSprite.asm"
@@ -41,6 +43,8 @@ incasm "gameBars.asm"
 incasm "gameFlow.asm"
 
 GameStart
+        LIBSCREEN_SETCOLORS Black, Black, Black, Black, Black
+
         jsr gmSetUpCustomCharacters
 
         ldx #0 ; Level 1
@@ -52,37 +56,13 @@ GameStart
         sta GameStatus
 
 GameLoop
-        LIBSCREEN_WAIT_V 255
+        LIBSCREEN_WAIT_V 240
 
         ;LIBSCREEN_DEBUG16BIT_VVAA 1,1,VerticalVelocity, VerticalVelocityFrac
         ;LIBSCREEN_DEBUG8BIT_VVA 8,1,LunaLanderY
 
-        ;lda GameLoopFrameTracker
-        ;bne GameLooper
-
-        lda DemoMode
-        cmp #255
-        bne @NotInDemoMode
-        jsr glDebugReadInputAndUpdateVariables
-        jsr glUpdateSpritePosition
-        jsr glDidWeCollideWithScene
-        jmp GameDebugByPass
-
-@NotInDemoMode
-        lda CollidedWithBackground
-        cmp #True
-        beq GameLooper
-
-        jsr glReadInputAndUpdateVariables
-        jsr glUpdateSpritePosition
-
-        jsr gbUpdateBarsAndGauges
-
-GameLooper
         jsr gfUpdateGameFlow
-
 GameDebugByPass
         jsr libSpritesUpdate
-
         jmp GameLoop
         

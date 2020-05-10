@@ -1,15 +1,16 @@
 gbUpdateBarsAndGauges
-        lda VerticalVelocityFracHi
-        sta VerticalBarValue
-        lda VerticalVelocity
-        lsr 
+        lda VerticalVelocityFracHi      ; Load Hi Value
+        sta VerticalBarValue            ; Bar Value
+        lda VerticalVelocity            ; Load Vertical Velocity
+        lsr                             ; /2
         ror VerticalBarValue
-        lsr 
+        lsr                             ; /4
         ror VerticalBarValue
-        lsr 
+        lsr                             ; /8
         ror VerticalBarValue
-        lda VerticalBarValue
-        eor #$FF
+        lda VerticalBarValue            ; load Bar Value
+        eor #$FF                        ; NOT The result (Invert)
+
         LIBBARSANDGAUGES_SHOWYBAR_AV $044E, $2C
 
         lda FuelBarValue
@@ -20,10 +21,10 @@ gbUpdateBarsAndGauges
 gbSetupFuelAndSpeedBars
         LIBBARSANDGAUGES_INITYBAR_AV $044E,12
         lda #Green
-        sta $D916
+        sta $D916                       ; Indicate Safe Landing Speed Zone
 
         LIBBARSANDGAUGES_INITYBAR_AV $044D,12
         lda #Red
-        sta $D9DD
+        sta $D9DD                       ; Show Low Fuel Zone
         sta $DA05
         rts

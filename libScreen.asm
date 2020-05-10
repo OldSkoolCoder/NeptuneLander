@@ -585,7 +585,7 @@ defm    LIBSCREEN_COPYSCREEN    ; /1 MemoryLocation of Screen To Copy
         sta SCREENRAM+750,y
 
         iny
-        cpy #251
+        cpy #250
         bne @loop
         
         endm
@@ -706,4 +706,40 @@ defm    LIBSCREEN_SET25ROWMODE
 
 ;==============================================================================
 
+;==============================================================================
+; Input Params : Y = Hi Location, Acc = Lo Location
+
+libScreen_CopyMap
+    
+        sta @Part1+1
+        sta @Part2+1
+        sta @Part3+1
+        sta @Part4+1
+
+        sty @Part1+2
+        iny
+        sty @Part2+2
+        iny
+        sty @Part3+2
+        iny
+        sty @Part4+2
+
+        ldy #0
+@loop
+@Part1
+        lda $1000,y
+        sta SCREENRAM,y
+@Part2
+        lda $1000,y
+        sta SCREENRAM+256,y
+@Part3
+        lda $1000,y
+        sta SCREENRAM+512,y
+@Part4
+        lda $1000,y
+        sta SCREENRAM+768,y
+
+        iny
+        bne @loop
+        rts
 

@@ -7,6 +7,7 @@ glSetUpLunarSprite
         sta LunaLanderXHi
         lda #0
         sta LunaLanderSpNo
+        lda #DarkGray
         sta LunaLanderColour
 
         lda #Red

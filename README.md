@@ -37,13 +37,14 @@ Enjoy
 * Episode 026 : Examining a Patreons Version, and possible pilphering
 * Episode 027 : Adding Title Screen and Reconfiguration of Game Flow
 * Episode 028 : Adding Speed Test on Landing
-
-## Episodes To Come
 * Episode 029 : Making Landscape more realistic
 * Episode 030 : Different Maps for Different Levels
+
+## Episodes To Come
 * Episode 031 : Optimising Levelling and Difficulty
 * Episode 032 : Adding New Levels
 * Episode 033 : Adding Difficulty Selection
 * Episode 034 : Game Play Progression
 * Episode 035 : Adding Sound Effect and "Lost In Space"
 * Episode 036 : Keyboard Integration
+* Episode 037 : Finishing Off the Keyboard Intergration

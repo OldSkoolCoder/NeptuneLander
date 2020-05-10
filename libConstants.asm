@@ -145,6 +145,7 @@ GF_Menu         = 0
 GF_Title        = 5
 GF_Retry        = 6
 GF_NextLevel    = 7
+GF_UpdateScore  = 8
 
 
 scDisplayScoringLocationH = $07D4
