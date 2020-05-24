@@ -743,3 +743,41 @@ libScreen_CopyMap
         bne @loop
         rts
 
+;==============================================================================
+; Input Parameters : Acc = Colour
+;                  : ZeroPageParam5 = X
+;                  : ZeroPageParam6 = Y
+;                  : ZeroPageParam7 = #
+
+libScreen_SetColour
+    pha     ; Push Colour To Stack
+    ldy ZeroPageParam6
+    lda ColorRAMRowStartLow,y
+    sta @RowOne + 1
+    lda ColorRAMRowStartHigh,y
+    sta @RowOne + 2
+
+    iny
+    lda ColorRAMRowStartLow,y
+    sta @RowTwo + 1
+    lda ColorRAMRowStartHigh,y
+    sta @RowTwo + 2
+
+    ldx #0
+    ldy ZeroPageParam5
+    pla
+@Looper
+    
+@RowOne
+    sta $1000,y
+@RowTwo
+    sta $1000,y
+    iny
+    inx
+    cpx ZeroPageParam7
+    bne @Looper
+    rts
+
+    
+
+

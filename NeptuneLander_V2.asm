@@ -15,17 +15,11 @@ incasm "incSIDPlayer.asm"
 ; Load Sprites 1-> 5 padded to 64 bytes
 incbin "NeptuneLander.spt", 1, 6 ,true
 incbin "DereksExplosions.spt", 5, 16, true
-incbin "NeptuneLanderExtended.spt", 1, 1, true
+incbin "NeptuneLanderExtended.spt", 1, 11, true
 
 ; CharacterSet
-*=$3000
-incbin "SevenUpV2.cst", 0, 255
-
 *=$3800
-SplashScreen
-incbin "Intro2.sdd", 1, 1
-
-    dcb 32,0
+incbin "SevenUpV2.cst", 0, 255
 
 *=$4000
 incasm "libSprite.asm"
@@ -48,7 +42,7 @@ GameStart
         jsr gmSetUpCustomCharacters
 
         ldx #0 ; Level 1
-        ldy #0 ; Normal=1 / Easy=0 / Hard=2 Difficulty
+        ldy #2 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
         stx GameLevel
         sty GameDifficulty
 
@@ -66,3 +60,18 @@ GameDebugByPass
         jsr libSpritesUpdate
         jmp GameLoop
         
+*=$5400
+SplashScreen
+incbin "Intro2.sdd", 1, 1
+
+; ============================================================================
+; Level Landscapes
+
+gmLevelOneLandscape
+incbin "NewLandScapeV2.sdd", 1, 1,CHAR
+
+gmLevelTwoLandscape
+incbin "NewLandScapeV2.sdd", 2, 2,CHAR
+
+
+

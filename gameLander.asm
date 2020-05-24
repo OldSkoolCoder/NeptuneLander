@@ -10,6 +10,9 @@ glSetUpLunarSprite
         lda #DarkGray
         sta LunaLanderColour
 
+        lda #Yellow
+        sta LunaLanderWindowCol
+
         lda #Red
         sta ThrustColour
         sta ManuoverColour
@@ -21,10 +24,16 @@ glSetUpLunarSprite
 
         ; 20 POKE 2040,170 : REM SPRITE POINT * 64 = 170 * 64 = 10880
         ; 25 POKE 2041,186
-        LIBSPRITE_SETFRAME_AV LunaLanderSpNo, spLunaLander
+        LIBSPRITE_SETFRAME_AA
+        LIBSPRITE_SETFRAME_AA LunaLanderSpNo, SpriteShipNo
         LIBSPRITE_SETFRAME_AV ThrustSpNo, spNoThrust
         LIBSPRITE_SETFRAME_AV ManuoverSpNo, spNoThrust
-        LIBSPRITE_SETFRAME_AV LunaLanderWindowSpNo, spLunaLanderWindows
+        LIBSPRITE_SETFRAME_AA LunaLanderWindowSpNo, SpriteWindowShipNo
+
+;        LIBSPRITE_SETFRAME_AV LunaLanderSpNo, spLunaLander
+;        LIBSPRITE_SETFRAME_AV ThrustSpNo, spNoThrust
+;        LIBSPRITE_SETFRAME_AV ManuoverSpNo, spNoThrust
+;        LIBSPRITE_SETFRAME_AV LunaLanderWindowSpNo, spLunaLanderWindows
 
         ;poke 53269,3
         LIBSPRITE_ENABLE_AV LunaLanderSpNo, True
@@ -165,7 +174,7 @@ glReadInputAndUpdateVariables
 
         ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
         LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
-        ldx #spThrustLeft
+        ldx SpriteThrustLeftNo
         stx ManuoverFrameNo
         jsr gmAddFuelConsumption
 
@@ -175,7 +184,7 @@ glReadInputAndUpdateVariables
 
         ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
         LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
-        ldx #spThrustRight
+        ldx SpriteThrustRightNo
         stx ManuoverFrameNo
         jsr gmAddFuelConsumption
 
@@ -186,7 +195,7 @@ glReadInputAndUpdateVariables
         ;110 IF A = 22 THEN VV = VV - T : TS=183 : 
 @FireDetected
         LIBMATH_SUB24BIT_AAA VerticalVelocityFracLo, ThrustFracLo, VerticalVelocityFracLo
-        ldx #spThrustDown
+        ldx SpriteThrustNo
         stx ThrustFrameNo
         jsr gmAddFuelConsumption
         jsr gmAddFuelConsumption

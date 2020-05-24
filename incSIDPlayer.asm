@@ -28,7 +28,7 @@ irq
     lda #$01
     sta $d019 ; ACK any raster IRQs
     jsr $1003
-    jmp $ea31
+    jmp $ea81
 
 * = $1000 ; Dark Tower & Acid Mix
 incbin "Acid_Mix.sid", $7E

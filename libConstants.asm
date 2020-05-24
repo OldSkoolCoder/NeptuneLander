@@ -130,11 +130,11 @@ krljmp_SCREEN$      = $FFED
 krljmp_PLOT$        = $FFF0
 krljmp_BASE$        = $FFF3
 
-spLunaLander    = 0
-spLunaLanderWindows = 18
-spThrustDown    = 2
-spThrustLeft    = 4
-spThrustRight   = 3
+;spLunaLander    = 0
+;spLunaLanderWindows = 18
+;spThrustDown    = 2
+;spThrustLeft    = 4
+;spThrustRight   = 3
 spNoThrust      = 5
 
 GF_InFlight     = 1

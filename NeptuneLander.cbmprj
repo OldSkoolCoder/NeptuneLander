@@ -56,7 +56,7 @@
     </BuildList>
     <DetermineBuildOrder>0</DetermineBuildOrder>
     <PaddingByte>0</PaddingByte>
-    <AssyBinaryFileLocation>C:\Users\John\OneDrive\Documents\My Source Code\DALESOFT\Commodore 64\NeptuneLander\Level1.bin</AssyBinaryFileLocation>
+    <AssyBinaryFileLocation>Level1.bin</AssyBinaryFileLocation>
     <SourceFiles>
         <SourceFile>
             <Name>Data-Sprite Collider.bas</Name>
@@ -276,7 +276,7 @@
             <Breakpoints />
             <Bookmarks />
             <Topmost>False</Topmost>
-            <FileOpen>True</FileOpen>
+            <FileOpen>False</FileOpen>
         </SourceFile>
         <SourceFile>
             <Name>libSprite.asm</Name>
@@ -287,7 +287,7 @@
             <Breakpoints />
             <Bookmarks />
             <Topmost>False</Topmost>
-            <FileOpen>False</FileOpen>
+            <FileOpen>True</FileOpen>
         </SourceFile>
         <SourceFile>
             <Name>NeptuneLander.bas</Name>

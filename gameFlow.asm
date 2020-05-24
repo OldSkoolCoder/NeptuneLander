@@ -196,11 +196,6 @@ gfStatusDead
     lda #False
     sta CollidedWithBackground
 
-    ldx #0 ; Level 1
-    ldy #0 ; Normal=1 / Easy=0 / Hard=2 Difficulty
-    stx GameLevel
-    sty GameDifficulty
-
     jsr glDisableSprites
     ;lda #GF_Retry
     ;sta GameStatus
@@ -289,12 +284,21 @@ gfScrollScreenDown
     lda #50
     sta ScrollLooper + 1
 
+    lda #0
+    sta GameLoopFrameTracker
+
 ScrollLooper
     ;LIBSCREEN_WAIT_V 255
 
     lda #128            ; Scanline -> A
     cmp RASTER          ; Compare A to current raster line
     bne ScrollLooper    ; Loop if raster line not reached 255
+
+    lda GameLoopFrameTracker
+    clc
+    adc #$80
+    sta GameLoopFrameTracker
+    bcc ScrollLooper
 
     LIBSCREEN_SCROLLYDOWN_A gfUpdateIntroScreen
 
@@ -305,6 +309,19 @@ ScrollLooper
     jmp ScrollLooper
 
 @End
+
+    ldy #0
+@screencolourlooper
+    lda $DA8F,y
+    and #$0F
+    cmp #Orange
+    bne @continue
+    lda #Black
+    sta $DA8F,y
+@continue
+    iny
+    bne @screencolourlooper
+
     LIBSCREEN_SET25ROWMODE
 
     ldy #>txtNeptuneLanderTitle1
@@ -563,11 +580,11 @@ gfPrepareToLanderCaptain
 ;**********************************************************************
 ; Confirmation of Game Next Level.
 gfNextLevel
+    jsr glDisableSprites
+    jsr gfPrepareToLanderCaptain
     ldx GameLevel
     ldy GameDifficulty
     ;inx
-    jsr glDisableSprites
-    jsr gfPrepareToLanderCaptain
     jsr gmSetUpGameVariables
     jsr glSetUpLunarSprite
     jsr gbSetUpFuelAndSpeedBars
