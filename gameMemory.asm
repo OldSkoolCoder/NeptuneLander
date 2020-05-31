@@ -535,40 +535,40 @@ gmLevel1Array
     byte 5,23,3    ; Pad 3 X, Y, Length
 
 gmLevel2Array
-    byte $3F,0    ; Pad One Start X
-    byte $42,0    ; Pad One Finish X
-    byte $DC      ; Pad One Start Y
-    byte $DC      ; Pad One Finish Y
-    byte $8C,0    ; Pad Two Start X
-    byte $91,0    ; Pad Two Finish X
-    byte $7C      ; Pad Two Start Y
+    byte $4B,0    ; Pad One Start X
+    byte $51,0    ; Pad One Finish X
+    byte $D3      ; Pad One Start Y
+    byte $D4      ; Pad One Finish Y
+    byte $98,0    ; Pad Two Start X
+    byte $9B,0    ; Pad Two Finish X
+    byte $7B      ; Pad Two Start Y
     byte $7C      ; Pad Two Finish Y
-    byte $08,$01    ; Pad Three Start X
-    byte $11,$01    ; Pad Three Finish X
-    byte $C4      ; Pad Three Start Y
-    byte $C4      ; Pad Three Finish Y
-    word gmLevelOneLandscape
-    byte 30,20,4    ; Pad 1 X, Y, Length
-    byte 15,11,3    ; Pad 2 X, Y, Length
-    byte 5,23,3    ; Pad 3 X, Y, Length
+    byte $18,$01    ; Pad Three Start X
+    byte $20,$01    ; Pad Three Finish X
+    byte $8B      ; Pad Three Start Y
+    byte $8C      ; Pad Three Finish Y
+    word gmLevelTwoLandscape
+    byte 7,22,3    ; Pad 1 X, Y, Length
+    byte 16,11,3    ; Pad 2 X, Y, Length
+    byte 32,13,4    ; Pad 3 X, Y, Length
 
 gmLevel3Array
-    byte $3F,0    ; Pad One Start X
-    byte $42,0    ; Pad One Finish X
-    byte $DC      ; Pad One Start Y
-    byte $DC      ; Pad One Finish Y
-    byte $8C,0    ; Pad Two Start X
-    byte $91,0    ; Pad Two Finish X
-    byte $7C      ; Pad Two Start Y
-    byte $7C      ; Pad Two Finish Y
-    byte $08,$01    ; Pad Three Start X
-    byte $11,$01    ; Pad Three Finish X
-    byte $C4      ; Pad Three Start Y
-    byte $C4      ; Pad Three Finish Y
-    word gmLevelOneLandscape
-    byte 30,20,4    ; Pad 1 X, Y, Length
+    byte 57,0    ; Pad One Start X
+    byte 64,0    ; Pad One Finish X
+    byte 219      ; Pad One Start Y
+    byte 220      ; Pad One Finish Y
+    byte 145,0    ; Pad Two Start X
+    byte 147,0    ; Pad Two Finish X
+    byte 123      ; Pad Two Start Y
+    byte 124      ; Pad Two Finish Y
+    byte 192,0    ; Pad Three Start X
+    byte 200,0    ; Pad Three Finish X
+    byte 203      ; Pad Three Start Y
+    byte 204      ; Pad Three Finish Y
+    word gmLevelThreeLandscape
+    byte 4,23,4    ; Pad 1 X, Y, Length
     byte 15,11,3    ; Pad 2 X, Y, Length
-    byte 5,23,3    ; Pad 3 X, Y, Length
+    byte 21,21,4    ; Pad 3 X, Y, Length
 
 gmDifficultyEasy
     byte 0,1,0    ; Gravity Frac, Gravity

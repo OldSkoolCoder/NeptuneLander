@@ -41,13 +41,16 @@ GameStart
 
         jsr gmSetUpCustomCharacters
 
-        ldx #0 ; Level 1
-        ldy #2 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
+        ldx #2 ; Level 1
+        ldy #0 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
         stx GameLevel
         sty GameDifficulty
 
         lda #GF_Title
         sta GameStatus
+
+        ;lda #255
+        ;sta DemoMode
 
 GameLoop
         LIBSCREEN_WAIT_V 240
@@ -73,5 +76,7 @@ incbin "NewLandScapeV2.sdd", 1, 1,CHAR
 gmLevelTwoLandscape
 incbin "NewLandScapeV2.sdd", 2, 2,CHAR
 
+gmLevelThreeLandscape
+incbin "NewLandScapeV2.sdd", 3, 3,CHAR
 
 
