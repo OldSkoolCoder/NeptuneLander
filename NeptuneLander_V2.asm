@@ -35,33 +35,26 @@ incasm "gameMemory.asm"
 incasm "gameLander.asm"
 incasm "gameBars.asm"
 incasm "gameFlow.asm"
+incasm "gameScreens.asm"
 
 GameStart
-        LIBSCREEN_SETCOLORS Black, Black, Black, Black, Black
+    lda #GF_Initialise             ; Initialise the Game
+    sta GameStatus
 
-        jsr gmSetUpCustomCharacters
-
-        ldx #2 ; Level 1
-        ldy #0 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
-        stx GameLevel
-        sty GameDifficulty
-
-        lda #GF_Title
-        sta GameStatus
-
-        ;lda #255
-        ;sta DemoMode
+    ;lda #255
+    ;sta DemoMode
 
 GameLoop
-        LIBSCREEN_WAIT_V 240
+    LIBSCREEN_WAIT_V 240
 
-        ;LIBSCREEN_DEBUG16BIT_VVAA 1,1,VerticalVelocity, VerticalVelocityFrac
-        ;LIBSCREEN_DEBUG8BIT_VVA 8,1,LunaLanderY
+    ;LIBSCREEN_DEBUG16BIT_VVAA 1,1,VerticalVelocity, VerticalVelocityFrac
+    ;LIBSCREEN_DEBUG8BIT_VVA 8,1,LunaLanderY
 
-        jsr gfUpdateGameFlow
+    jsr gfUpdateGameFlow
+
 GameDebugByPass
-        jsr libSpritesUpdate
-        jmp GameLoop
+    jsr libSpritesUpdate
+    jmp GameLoop
         
 *=$5400
 SplashScreen

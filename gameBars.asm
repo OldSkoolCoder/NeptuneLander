@@ -20,8 +20,32 @@ gbUpdateBarsAndGauges
 
 gbSetupFuelAndSpeedBars
         LIBBARSANDGAUGES_INITYBAR_AV $044E,12
+
+        lda MaxSafeLandingSpeed
+        lsr                     ; divind by 2
+        lsr                     ; divide by 4
+        lsr                     ; divide by 8
+        tay
+        dey
+
+        lda #$D9
+        sta SafeZonePlace + 2
+        lda #$16
+        sta SafeZonePlace + 1
+
+SafeZoneLoop
         lda #Green
+SafeZonePlace
         sta $D916                       ; Indicate Safe Landing Speed Zone
+        sec
+        lda SafeZonePlace + 1
+        sbc #40
+        sta SafeZonePlace + 1
+        bcs @Bypass
+        dec SafeZonePlace + 2
+@ByPass
+        dey
+        bpl SafeZoneLoop
 
         LIBBARSANDGAUGES_INITYBAR_AV $044D,12
         lda #Red

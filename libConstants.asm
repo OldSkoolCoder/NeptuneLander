@@ -15,10 +15,10 @@ ZeroPageParam7  = $79
 ZeroPageParam8  = $7A
 ZeroPageParam9  = $7B
                 ; $90-$FA   Reserved for Kernal
-ZeroPageLow     = $FB
-ZeroPageHigh    = $FC
-ZeroPageLow2    = $FD
-ZeroPageHigh2   = $FE
+ZeroPageLow     = $45
+ZeroPageHigh    = $46
+ZeroPageLow2    = $47
+ZeroPageHigh2   = $48
                 ; $FF       Reserved for Kernal
 
 ;===============================================================================
@@ -146,7 +146,12 @@ GF_Title        = 5
 GF_Retry        = 6
 GF_NextLevel    = 7
 GF_UpdateScore  = 8
+GF_Initialise   = 9
+GF_Difficulty   = 10
 
+GD_Easy = 0
+GD_Normal = 1
+GD_Hard = 2
 
 scDisplayScoringLocationH = $07D4
 scDisplayScoringLocationM = $07D6

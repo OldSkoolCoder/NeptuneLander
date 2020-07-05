@@ -213,6 +213,15 @@ SpriteThrustRightNo
 SpriteThrustLeftNo
         byte 0
 
+TitleMusicSet
+        byte 0
+
+PlayMusicSet
+        byte 0
+
+MaxSafeLandingSpeed
+        byte 0
+
 
         ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
 gmSetUpGameVariables
@@ -297,6 +306,11 @@ gmSetUpGameVariables
         iny
         lda (ZeroPageLow2),y            ; ShipThrust Right
         sta SpriteThrustRightNo
+
+        iny
+        lda (ZeroPageLow2),y            ; Max Safe Landing Speed
+        sta MaxSafeLandingSpeed
+
 
         pla
         asl                 ; Multiply By 2
@@ -517,52 +531,52 @@ gmDifficultyArray
     word gmDifficultyHard
 
 gmLevel1Array
-    byte $3F,0    ; Pad One Start X
-    byte $42,0    ; Pad One Finish X
-    byte $DC      ; Pad One Start Y
-    byte $DC      ; Pad One Finish Y
-    byte $8C,0    ; Pad Two Start X
-    byte $91,0    ; Pad Two Finish X
-    byte $7C      ; Pad Two Start Y
-    byte $7C      ; Pad Two Finish Y
-    byte $08,$01    ; Pad Three Start X
-    byte $11,$01    ; Pad Three Finish X
-    byte $C4      ; Pad Three Start Y
-    byte $C4      ; Pad Three Finish Y
+    byte 57,0    ; Pad One Start X
+    byte 70,0    ; Pad One Finish X
+    byte 219      ; Pad One Start Y
+    byte 220      ; Pad One Finish Y
+    byte 135,0    ; Pad Two Start X
+    byte 150,0    ; Pad Two Finish X
+    byte 123      ; Pad Two Start Y
+    byte 124      ; Pad Two Finish Y
+    byte $01,$01    ; Pad Three Start X (257)
+    byte $17,$01    ; Pad Three Finish X (279)
+    byte 195      ; Pad Three Start Y
+    byte 195      ; Pad Three Finish Y
     word gmLevelOneLandscape
     byte 30,20,4    ; Pad 1 X, Y, Length
     byte 15,11,3    ; Pad 2 X, Y, Length
     byte 5,23,3    ; Pad 3 X, Y, Length
 
 gmLevel2Array
-    byte $4B,0    ; Pad One Start X
-    byte $51,0    ; Pad One Finish X
-    byte $D3      ; Pad One Start Y
-    byte $D4      ; Pad One Finish Y
-    byte $98,0    ; Pad Two Start X
-    byte $9B,0    ; Pad Two Finish X
-    byte $7B      ; Pad Two Start Y
-    byte $7C      ; Pad Two Finish Y
-    byte $18,$01    ; Pad Three Start X
-    byte $20,$01    ; Pad Three Finish X
-    byte $8B      ; Pad Three Start Y
-    byte $8C      ; Pad Three Finish Y
+    byte 68,0    ; Pad One Start X
+    byte 87,0    ; Pad One Finish X
+    byte 211      ; Pad One Start Y
+    byte 212      ; Pad One Finish Y
+    byte 145,0    ; Pad Two Start X
+    byte 159,0    ; Pad Two Finish X
+    byte 123      ; Pad Two Start Y
+    byte 124      ; Pad Two Finish Y
+    byte $11,$01    ; Pad Three Start X
+    byte $28,$01    ; Pad Three Finish X
+    byte 139      ; Pad Three Start Y
+    byte 140      ; Pad Three Finish Y
     word gmLevelTwoLandscape
     byte 7,22,3    ; Pad 1 X, Y, Length
     byte 16,11,3    ; Pad 2 X, Y, Length
     byte 32,13,4    ; Pad 3 X, Y, Length
 
 gmLevel3Array
-    byte 57,0    ; Pad One Start X
-    byte 64,0    ; Pad One Finish X
+    byte 49,0    ; Pad One Start X
+    byte 70,0    ; Pad One Finish X
     byte 219      ; Pad One Start Y
     byte 220      ; Pad One Finish Y
-    byte 145,0    ; Pad Two Start X
-    byte 147,0    ; Pad Two Finish X
+    byte 137,0    ; Pad Two Start X
+    byte 151,0    ; Pad Two Finish X
     byte 123      ; Pad Two Start Y
     byte 124      ; Pad Two Finish Y
-    byte 192,0    ; Pad Three Start X
-    byte 200,0    ; Pad Three Finish X
+    byte 185,0    ; Pad Three Start X
+    byte 205,0    ; Pad Three Finish X
     byte 203      ; Pad Three Start Y
     byte 204      ; Pad Three Finish Y
     word gmLevelThreeLandscape
@@ -582,6 +596,7 @@ gmDifficultyEasy
     byte 20     ; Thrust No
     byte 22     ; Thrust Left
     byte 21     ; Thrust Right
+    byte 16     ; Safe Landing Speed Max
 
 gmDifficultyNormal
     byte 0,2,0    ; Gravity Frac, Gravity
@@ -595,6 +610,7 @@ gmDifficultyNormal
     byte 24     ; Thrust No
     byte 26     ; Thrust Left
     byte 25     ; Thrust Right
+    byte 16     ; Safe Landing Speed Max
 
 gmDifficultyHard
     byte 0,2,0    ; Gravity Frac, Gravity
@@ -606,8 +622,9 @@ gmDifficultyHard
     byte 0      ; Ship SpriteNo
     byte 18     ; Ship Window No
     byte 2     ; Thrust No
-    byte 3     ; Thrust Left
-    byte 4     ; Thrust Right
+    byte 4     ; Thrust Left
+    byte 3     ; Thrust Right
+    byte 8     ; Safe Landing Speed Max
 
 txtCurrentScore
     text "{home}{down*24}{right*12}{white}score :{up}"
@@ -637,6 +654,13 @@ txtNeptuneLanderTitle3
     text "{home}{down*23}{right*10}{yellow}press fire to start{white}"
     byte 0
 
+txtWhichDifficultyLevel
+    text "{clear}{down*10}"
+    text "{right*4} easy (e){return}{down}"
+    text "{right*4} normal (n){return}{down}"
+    text "{right*4} hard (h){return}{down}"
+    text "{right*4} please select difficulty e/n/h?"
+    byte 0
 
 ;@LevelOneEasyLandscape
 ;    TEXT "{white}{clear}{down*7}GG{down}{left*2}XXBC{down}{left*4}XXXXD{down}{left*5}{X*5}H{down}{left*6}{X*5}J{down}{left*6}{X*6}H"
