@@ -594,6 +594,19 @@ defm    LIBSCREEN_COPYSCREEN    ; /1 MemoryLocation of Screen To Copy
 
 ;==============================================================================
 
+defm    LIBSCREEN_COPYROW    ; /1 MemoryLocation of Screen To Copy
+
+        lda /1,y
+        sta /1+40,y
+        lda /1+$D400,y
+        sta /1+$D428,y
+        
+        endm
+
+;===============================================================================
+
+;==============================================================================
+
 defm    LIBSCREEN_SCROLLYUP_A          ; /1 = update subroutine (Address)
 
         dec screenScrollYValue

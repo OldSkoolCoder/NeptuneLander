@@ -8,14 +8,6 @@ gsPrepareToLanderCaptain
     lda #<txtPrepareToLandCaptain
     jsr $AB1E
     
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
     rts
 
 ;********************************************************
@@ -30,163 +22,38 @@ gsTheEagleHasLanded
 ; screen.
 gsUpdateIntroScreen
 
-    ldy #23
+    ldy #8
 @gsCharacterLoopSection
     ; Last Section First
 
+    ;LIBSCREEN_COPYROW $07C0
+    ;LIBSCREEN_COPYROW $0798
+    ;LIBSCREEN_COPYROW $0770
+    ;LIBSCREEN_COPYROW $0748
+    ;LIBSCREEN_COPYROW $0720
+    LIBSCREEN_COPYROW $06F8
+    LIBSCREEN_COPYROW $06D0
+    LIBSCREEN_COPYROW $06A8
+    LIBSCREEN_COPYROW $0680
+    LIBSCREEN_COPYROW $0658
+    LIBSCREEN_COPYROW $0630
+    LIBSCREEN_COPYROW $0608
+    LIBSCREEN_COPYROW $05E0
+    LIBSCREEN_COPYROW $05B8
+    LIBSCREEN_COPYROW $0590
+    LIBSCREEN_COPYROW $0568
+    LIBSCREEN_COPYROW $0540
+    LIBSCREEN_COPYROW $0518
+    LIBSCREEN_COPYROW $04F0
+    LIBSCREEN_COPYROW $04C8
+    LIBSCREEN_COPYROW $04A0
+    LIBSCREEN_COPYROW $0478
+    LIBSCREEN_COPYROW $0450
+    LIBSCREEN_COPYROW $0428
+    LIBSCREEN_COPYROW $0400
 
-;    lda $07C0+ 8,y
-;    sta $07E8+ 8,y
-
-;    lda $DBC0+ 8,y
-;    sta $DBE8+ 8,y
-
-    ;lda $0798+ 8,y
-    ;sta $07C0+ 8,y
-
-    ;lda $DB98+ 8,y
-    ;sta $DBC0+ 8,y
-
-    ;lda $0770+ 8,y
-    ;sta $0798+ 8,y
-
-    ;lda $DB70+ 8,y
-    ;sta $DB98+ 8,y
-
-    ;lda $0748+ 8,y
-    ;sta $0770+ 8,y
-
-    ;lda $DB48+ 8,y
-    ;sta $DB70+ 8,y
-
-    lda $0720+ 8,y
-    sta $0748+ 8,y
-
-    lda $DB20+ 8,y
-    sta $DB48+ 8,y
-
-    lda $06F8+ 8,y
-    sta $0720+ 8,y
-
-    lda $DAF8+ 8,y
-    sta $DB20+ 8,y
-
-    lda $06D0+ 8,y
-    sta $06F8+ 8,y
-
-    lda $DAD0+ 8,y
-    sta $DAF8+ 8,y
-
-    lda $06A8+ 8,y
-    sta $06D0+ 8,y
-
-    lda $DAA8+ 8,y
-    sta $DAD0+ 8,y
-
-    lda $0680+ 8,y
-    sta $06A8+ 8,y
-
-    lda $DA80+ 8,y
-    sta $DAA8+ 8,y
-
-    lda $0658+ 8,y
-    sta $0680+ 8,y
-
-    lda $DA58+ 8,y
-    sta $DA80+ 8,y
-
-    lda $0630+ 8,y
-    sta $0658+ 8,y
-
-    lda $DA30+ 8,y
-    sta $DA58+ 8,y
-
-    lda $0608+ 8,y
-    sta $0630+ 8,y
-
-    lda $DA08+ 8,y
-    sta $DA30+ 8,y
-
-    lda $05E0+ 8,y
-    sta $0608+ 8,y
-
-    lda $D9E0+ 8,y
-    sta $DA08+ 8,y
-
-    lda $05B8+ 8,y
-    sta $05E0+ 8,y
-
-    lda $D9B8+ 8,y
-    sta $D9E0+ 8,y
-
-    lda $0590+ 8,y
-    sta $05B8+ 8,y
-
-    lda $D990+ 8,y
-    sta $D9B8+ 8,y
-
-    lda $0568+ 8,y
-    sta $0590+ 8,y
-
-    lda $D968+ 8,y
-    sta $D990+ 8,y
-
-    lda $0540+ 8,y
-    sta $0568+ 8,y
-
-    lda $D940+ 8,y
-    sta $D968+ 8,y
-
-    lda $0518+ 8,y
-    sta $0540+ 8,y
-
-    lda $D918+ 8,y
-    sta $D940+ 8,y
-
-    lda $04F0+ 8,y
-    sta $0518+ 8,y
-
-    lda $D8F0+ 8,y
-    sta $D918+ 8,y
-
-    lda $04C8+ 8,y
-    sta $04F0+ 8,y
-
-    lda $D8C8+ 8,y
-    sta $D8F0+ 8,y
-
-    lda $04A0+ 8,y
-    sta $04C8+ 8,y
-
-    lda $D8A0+ 8,y
-    sta $D8C8+ 8,y
-
-    lda $0478+ 8,y
-    sta $04A0+ 8,y
-
-    lda $D878+ 8,y
-    sta $D8A0+ 8,y
-
-    lda $0450+ 8,y
-    sta $0478+ 8,y
-
-    lda $D850+ 8,y
-    sta $D878+ 8,y
-
-    lda $0428+ 8,y
-    sta $0450+ 8,y
-
-    lda $D828+ 8,y
-    sta $D850+ 8,y
-
-    lda $0400+ 8,y
-    sta $0428+ 8,y
-
-    lda $D800+ 8,y
-    sta $D828+ 8,y
-
-    dey
-    cpy #$FF
+    iny
+    cpy #32
     beq @gsDone
     jmp @gsCharacterLoopSection
 
@@ -322,3 +189,26 @@ gsPleaseSelectDifficulty
     ldy #>txtWhichDifficultyLevel
     lda #<txtWhichDifficultyLevel
     jmp $AB1E
+
+;********************************************************
+;* Display "The Current Level"
+gsDisplayCurrentLevel
+    ldy #>txtLevelNotification
+    lda #<txtLevelNotification
+    jsr $AB1E
+    lda GameLevel
+    clc
+    adc #$31
+    sta 1248
+    
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+
+    rts
+

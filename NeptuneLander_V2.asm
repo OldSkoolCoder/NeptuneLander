@@ -56,7 +56,7 @@ GameDebugByPass
     jsr libSpritesUpdate
     jmp GameLoop
         
-*=$5400
+*=$5500
 SplashScreen
 incbin "Intro2.sdd", 1, 1
 

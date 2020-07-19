@@ -222,6 +222,12 @@ PlayMusicSet
 MaxSafeLandingSpeed
         byte 0
 
+NumberOfSuccessfulLandings
+        byte 0
+
+DontResetFuel
+        byte 0
+
 
         ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
 gmSetUpGameVariables
@@ -289,7 +295,6 @@ gmSetUpGameVariables
         iny
         lda (ZeroPageLow2),y            ; Fuel Tank Size
         sta FuelTankSize
-        
 
         iny
         lda (ZeroPageLow2),y            ; Ship Sprite No
@@ -480,11 +485,17 @@ gmSetUpGameVariables
 ;        lda #2
 ;        sta HorizontalInertiaFrac
 
+        lda #0
+        sta LandingPadNumber
+
+        lda DontResetFuel
+        cmp #True
+        beq @ByPassFuel
         lda #8
         sta FuelBarValueFrac
         lda #0
         sta FuelBarValue
-        sta LandingPadNumber
+@ByPassFuel
         lda #GF_InFlight
         sta GameStatus
 
@@ -660,6 +671,10 @@ txtWhichDifficultyLevel
     text "{right*4} normal (n){return}{down}"
     text "{right*4} hard (h){return}{down}"
     text "{right*4} please select difficulty e/n/h?"
+    byte 0
+
+txtLevelNotification
+    text "{home}{down*5}{right*15}level : 00"
     byte 0
 
 ;@LevelOneEasyLandscape

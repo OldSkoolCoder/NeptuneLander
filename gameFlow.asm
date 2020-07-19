@@ -12,6 +12,7 @@ gfStatusJumpTableLo
     BYTE <gfUpdateScore
     BYTE <gfInitialiseGame
     BYTE <gfDifficultyChoice
+    BYTE <gfDiedButLetsTryAgain
 
 gfStatusJumpTableHi
     BYTE >gfStatusMenu
@@ -25,6 +26,7 @@ gfStatusJumpTableHi
     BYTE >gfUpdateScore
     BYTE >gfInitialiseGame
     BYTE >gfDifficultyChoice
+    BYTE >gfDiedButLetsTryAgain
 
 ;***********************************************************************
 ; Main Status Flow Routing Routine
@@ -36,6 +38,105 @@ gfUpdateGameFlow
     sta ZeroPageHigh
 
     jmp (ZeroPageLow)           ; Jump To Game Mode Routine
+
+;**********************************************************************
+; Initialise The Game for Playing
+gfInitialiseGame
+    LIBSCREEN_SETCOLORS Black, Black, Black, Black, Black
+
+    jsr gmSetUpCustomCharacters
+    jsr SetUpSIDPlayer
+
+    ldx #0 ; Level 1
+    ldy #0 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
+    stx GameLevel
+    sty GameDifficulty
+
+    lda #GF_Title       ; Set Game Status To Title for next cycle
+    sta GameStatus
+    rts
+
+;**********************************************************************
+; Neptune Lander Title Splash Screen
+gfSetUpSplashScreen
+    jsr gsScrollScreenDown      ; Scroll in the Title screen
+    lda #GF_Difficulty          ; Set game status to difficulty menu
+    sta GameStatus
+    rts
+
+;**********************************************************************
+; Initialise The Game for Playing
+gfDifficultyChoice
+    jsr gsPleaseSelectDifficulty    ; Print difficulty options
+
+@gfKeyboardCheck
+    lda LSTX                    ; load current key scan results
+    cmp #scanCode_NO_KEY$       ; Check for No Key Pressed
+    beq @gfKeyboardCheck        ; No Key was pressed
+
+    cmp #scanCode_E$            ; Easy Mode (E)
+    bne @gfKeyTryNormal
+    ldx #GD_Easy
+    jmp @gfDifficultySelected
+
+@gfKeyTryNormal
+    cmp #scanCode_N$            ; Normal Mode (N)
+    bne @gfKeyTryHard
+    ldx #GD_Normal
+    jmp @gfDifficultySelected
+
+@gfKeyTryHard
+    cmp #scanCode_H$            ; Hard Mode (H)
+    bne @gfKeyboardCheck
+    ldx #GD_Hard
+
+@gfDifficultySelected
+    stx GameDifficulty
+
+    lda #0                      ; Reset Loop Counter
+    sta ZeroPageTemp
+
+gfSelectionLooper
+    ldx GameDifficulty
+    txa
+    asl     ; time by 2         ; because 2 lines per menu item
+
+    clc
+    adc #10                     ; add 10 as thats the start of the menu
+    tax
+
+    lda ColorRAMRowStartLow,x   ; Find start of address selected Row
+    sta @gfDifficultyRow + 1
+
+    lda ColorRAMRowStartHigh,x  ; Find start address of select row
+    sta @gfDifficultyRow + 2
+    
+    ldy #39
+    ldx #Green                  ; Load Green
+    inc ZeroPageTemp            ; Increase loop counter
+    lda ZeroPageTemp            
+    and #1                      ; and with 1 which results in either 1 or 0
+    bne @gfDifficultyRow -1     ; if 1 then leave green
+    ldx #Red                    ; if zero change to red
+    txa
+
+@gfDifficultyRow
+    sta $D800,y                 ; fill row with colour
+    dey
+    bpl @gfDifficultyRow
+
+    LIBINPUT_DELAY_V 255        ; delay for a short while
+
+    lda ZeroPageTemp
+    cmp #7                      ; have we dont this 7 times ?
+    beq @gfSelectionLooperEnd   ; Yup, right lets get out
+    jmp gfSelectionLooper       ; Nope, right lets do this again
+
+@gfSelectionLooperEnd
+    lda #GF_Retry               ; Set Status to game retry.
+    sta GameStatus
+
+    rts
 
 ;***********************************************************************
 ; Game Menu Mode
@@ -166,6 +267,10 @@ gfUpdateScore
     jmp gbUpdateBarsAndGauges
     
 @TankEmpty
+
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+
     lda #GF_NextLevel
     sta GameStatus
     rts
@@ -201,7 +306,16 @@ gfStatusDead
 
     jsr glDisableSprites
 
+    lda FuelBarValue
+    cmp FuelTankSize
+    bne @gfStillFuelRemaining
+    
     lda #GF_Title
+    sta GameStatus
+    jmp @gfNoGameReset
+
+@gfStillFuelRemaining
+    lda #GF_DiedSoTryAgain
     sta GameStatus
 
 @gfNoGameReset
@@ -245,20 +359,13 @@ gfWeHaveLanded
     rts
 
 ;**********************************************************************
-; Neptune Lander Title Splash Screen
-gfSetUpSplashScreen
-    jsr gsScrollScreenDown
-    lda #GF_Difficulty
-    sta GameStatus
-    rts
-
-;**********************************************************************
 ; Confirmation of Game Retry.
 gfGameRetry
     LIBSCREEN_SET25ROWMODE
     LIBSCREEN_SETSCROLLYVALUE_V 3
     jsr glDisableSprites
     jsr gsPrepareToLanderCaptain
+    jsr gsDisplayCurrentLevel
     ldx GameLevel
     ldy GameDifficulty
     jsr gmSetUpGameVariables
@@ -281,9 +388,19 @@ gfGameRetry
 gfNextLevel
     jsr glDisableSprites
     jsr gsPrepareToLanderCaptain
+    inc NumberOfSuccessfulLandings
+    lda NumberOfSuccessfulLandings
+    cmp #3
+    bne @StayOnSameLevel
+    ldx GameLevel
+    inx
+    stx GameLevel
+    lda #0
+    sta NumberOfSuccessfulLandings
+@StayOnSameLevel
     ldx GameLevel
     ldy GameDifficulty
-    ;inx
+    jsr gsDisplayCurrentLevel
     jsr gmSetUpGameVariables
     jsr glSetUpLunarSprite
     jsr gbSetUpFuelAndSpeedBars
@@ -295,81 +412,39 @@ gfNextLevel
 
     rts
 
-;**********************************************************************
-; Initialise The Game for Playing
-gfInitialiseGame
-    LIBSCREEN_SETCOLORS Black, Black, Black, Black, Black
+;********************************************************
+; Died, did we have fuel to try again
+gfDiedButLetsTryAgain
+    jsr glDisableSprites
+    jsr gsPrepareToLanderCaptain
+    jsr gsDisplayCurrentLevel
+    ldx GameLevel
+    ldy GameDifficulty
+    lda #True
+    sta DontResetFuel
+    jsr gmSetUpGameVariables
+    lda #False
+    sta DontResetFuel
+    jsr glSetUpLunarSprite
+    jsr gbSetUpFuelAndSpeedBars
+    jsr gmSetUpScoringDisplay
 
-    jsr gmSetUpCustomCharacters
-    jsr SetUpSIDPlayer
+    lda #0
+    sta ZeroPageParam4
 
-    ldx #2 ; Level 1
-    ldy #0 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
-    stx GameLevel
-    sty GameDifficulty
+gfTankEmptier
+    lda ZeroPageParam4
+    cmp FuelBarValue
+    bcs gfTankEmptied
+    inc ZeroPageParam4 
 
-    lda #GF_Title
-    sta GameStatus
-    rts
+    lda ZeroPageParam4
+    LIBBARSANDGAUGES_SHOWYGAUGE_AV $044D, $00
+    jmp gfTankEmptier
 
-;**********************************************************************
-; Initialise The Game for Playing
-gfDifficultyChoice
-
-    jsr gsPleaseSelectDifficulty
-
-@gfKeyboardCheck
-    lda 197
-    cmp #64
-    beq @gfKeyboardCheck
-
-    cmp #14     ; Easy Mode (E)
-    bne @gfKeyTryNormal
-    ldx #GD_Easy
-    jmp @gfDifficultySelected
-
-@gfKeyTryNormal
-    cmp #39     ; Normal Mode (N)
-    bne @gfKeyTryHard
-    ldx #GD_Normal
-    jmp @gfDifficultySelected
-
-@gfKeyTryHard
-    cmp #29     ; Hard Mode (H)
-    bne @gfKeyboardCheck
-    ldx #GD_Hard
-
-@gfDifficultySelected
-    stx GameDifficulty
-
-    txa
-    asl     ; time by 2
-
-    clc
-    adc #10
-    tax
-
-    lda ColorRAMRowStartLow,x
-    sta @gfDifficultyRow + 1
-
-    lda ColorRAMRowStartHigh,x
-    sta @gfDifficultyRow + 2
-    
-    ldy #39
-    lda #Green
-@gfDifficultyRow
-    sta $D800,y
-    dey
-    bpl @gfDifficultyRow
-
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-    LIBINPUT_DELAY_V 255
-
-    lda #GF_Retry
-    sta GameStatus
+gfTankEmptied
+    jsr glDidWeCollideWithScene ; Just in case we hit some words ;)
+    lda #False
+    sta CollidedWithBackground
 
     rts
-
