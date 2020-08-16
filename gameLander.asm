@@ -174,6 +174,7 @@ glReadInputAndUpdateVariables
 
         ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
         LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        jsr glSoundSideThrust
         ldx SpriteThrustLeftNo
         stx ManuoverFrameNo
         jsr gmAddFuelConsumption
@@ -184,6 +185,7 @@ glReadInputAndUpdateVariables
 
         ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
         LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        jsr glSoundSideThrust
         ldx SpriteThrustRightNo
         stx ManuoverFrameNo
         jsr gmAddFuelConsumption
@@ -195,6 +197,7 @@ glReadInputAndUpdateVariables
         ;110 IF A = 22 THEN VV = VV - T : TS=183 : 
 @FireDetected
         LIBMATH_SUB24BIT_AAA VerticalVelocityFracLo, ThrustFracLo, VerticalVelocityFracLo
+        jsr glSoundMainThrust
         ldx SpriteThrustNo
         stx ThrustFrameNo
         jsr gmAddFuelConsumption
@@ -236,4 +239,16 @@ glDisableSprites
     LIBSPRITE_ENABLE_AV ThrustSpNo, False
     LIBSPRITE_ENABLE_AV ManuoverSpNo, False
     LIBSPRITE_ENABLE_AV LunaLanderWindowSpNo, False
+    rts
+
+glSoundExplosion
+    LIBSOUND_PLAY_VAA 1, soundExplosionHigh, soundExplosionLow
+    rts
+
+glSoundSideThrust
+    LIBSOUND_PLAY_VAA 1, soundSideThrustHigh, soundSideThrustLow
+    rts
+
+glSoundMainThrust
+    LIBSOUND_PLAY_VAA 1, soundMainThrustHigh, soundMainThrustLow
     rts

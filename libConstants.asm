@@ -151,6 +151,7 @@ GF_UpdateScore  = 8
 GF_Initialise   = 9
 GF_Difficulty   = 10
 GF_DiedSoTryAgain = 11
+GF_LostInSpace  = 12
 
 GD_Easy = 0
 GD_Normal = 1

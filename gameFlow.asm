@@ -13,6 +13,7 @@ gfStatusJumpTableLo
     BYTE <gfInitialiseGame
     BYTE <gfDifficultyChoice
     BYTE <gfDiedButLetsTryAgain
+    BYTE <gfLostInSpace
 
 gfStatusJumpTableHi
     BYTE >gfStatusMenu
@@ -27,6 +28,7 @@ gfStatusJumpTableHi
     BYTE >gfInitialiseGame
     BYTE >gfDifficultyChoice
     BYTE >gfDiedButLetsTryAgain
+    BYTE >gfLostInSpace
 
 ;***********************************************************************
 ; Main Status Flow Routing Routine
@@ -45,7 +47,9 @@ gfInitialiseGame
     LIBSCREEN_SETCOLORS Black, Black, Black, Black, Black
 
     jsr gmSetUpCustomCharacters
-    jsr SetUpSIDPlayer
+    ;jsr SetUpSIDPlayer
+
+    jsr libSoundInit
 
     ldx #0 ; Level 1
     ldy #0 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
@@ -182,6 +186,17 @@ gfGameLooper
     lda CollidedWithBackground      ; load collision flag
     cmp #False
     bne @gfSpriteCollided             ; Oh Dear, we crashed
+
+    ; Testing For Lost In Space
+    lda LunaLanderY                 ; check we are under the bars
+    cmp #20
+    bcc @LostInSpace
+    jmp gfStatusInFlightOK          ; Flight is good
+
+@LostInSpace
+    lda #GF_LostInSpace
+    sta GameStatus
+
     rts                             ; No crash
 
 ;***********************************************************************
@@ -220,6 +235,8 @@ gfGameLooper
     LIBSPRITE_SETCOLOR_AV     LunaLanderSpNo, Yellow
     LIBSPRITE_MULTICOLORENABLE_AV LunaLanderSpNo, True
     LIBSPRITE_PLAYANIM_AVVVV  LunaLanderSpNo, 5, 16, 3, False
+
+    jsr glSoundExplosion
 
 gfNotCollided
     rts
@@ -448,3 +465,18 @@ gfTankEmptied
     sta CollidedWithBackground
 
     rts
+
+;***********************************************************
+gfLostInSpace
+    ldy #>txtLostInSpace
+    lda #<txtLostInSpace
+    jsr $AB1E
+    
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    
+    lda #GF_Dead            ; Update Dead
+    sta GameStatus
+
+    rts
+    

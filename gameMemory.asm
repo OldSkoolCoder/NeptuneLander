@@ -677,6 +677,10 @@ txtLevelNotification
     text "{home}{down*5}{right*15}level : 00"
     byte 0
 
+txtLostInSpace
+    text "{home}{yellow}{down*5}{right*12}danger, danger,{return}{right*8}they are lost in space."
+    byte 0
+
 ;@LevelOneEasyLandscape
 ;    TEXT "{white}{clear}{down*7}GG{down}{left*2}XXBC{down}{left*4}XXXXD{down}{left*5}{X*5}H{down}{left*6}{X*5}J{down}{left*6}{X*6}H"
 ;    TEXT "{down}{left*7}{X*6}J{down}{left*7}{X*6}I{down}{left*7}{X*6}K{down}{left*7}{X*5}E{down}{left*6}XXX{sh asterisk}A"

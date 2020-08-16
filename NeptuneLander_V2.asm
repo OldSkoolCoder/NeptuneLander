@@ -31,6 +31,7 @@ incasm "libPrint.asm"
 incasm "libBarsAndGauges.asm"
 incasm "libLuna.asm"
 incasm "libScoringSystem.asm"
+incasm "libSound.asm"
 incasm "gameMemory.asm"
 incasm "gameLander.asm"
 incasm "gameBars.asm"
@@ -54,9 +55,10 @@ GameLoop
 
 GameDebugByPass
     jsr libSpritesUpdate
+    jsr libSoundUpdate
     jmp GameLoop
         
-*=$5500
+*=$6000
 SplashScreen
 incbin "Intro2.sdd", 1, 1
 
