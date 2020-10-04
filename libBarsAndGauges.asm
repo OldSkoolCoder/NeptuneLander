@@ -2,6 +2,10 @@ XSCRNLOC = ZeroPageParam1
 YSCRNLOC = ZeroPageParam3
 YGAUGLOC = ZeroPageParam5
 
+FULLBlock = 255
+EmptyBlock = 247
+ORValue = 8
+
 XVALUE              ; X Velocity Value
     BYTE 00
 
@@ -28,12 +32,18 @@ XBARCHARACTERS
     ;     0   1   2   3   4   5   6   7   8
 
 YBARCHARACTERS
-    BYTE $20,$77,$45,$44,$40,$46,$52,$6F,$6F
+    ;BYTE $20,$77,$45,$44,$40,$46,$52,$6F,$6F
+    BYTE 246,238,239,240,241,242,243,244,245
     ;     0   1   2   3   4   5   6   7   8
+YBARCHARACTERSFULL
+    BYTE 255
 
 YGAUGECHARACTERS
-    BYTE $20,$63,$77,$78,$E2,$F9,$EF,$E4,$E4
+    ;BYTE 247,239,240,241,242,243,244,245,255
+    BYTE 246,254,253,252,251,250,249,248,247
     ;     0   1   2   3   4   5   6   7   8
+YGAUGECHARACTERSFULL
+    BYTE 255
 
 YSCREENOFFSETLO
     BYTE $00,$28,$50,$78,$A0,$C8,$F0,$18,$40,$68,$90,$B8,$E0
@@ -50,7 +60,7 @@ defm LIBBARSANDGAUGES_INITYBAR_AV   ; /1 = Start Location (Address)
     stx @SCREENLOC+1
     ldx #0
 @LOOP
-    lda #160
+    lda #FULLBlock
 @SCREENLOC
     sta /1
     clc
@@ -196,8 +206,8 @@ defm LIBBARSANDGAUGES_SHOWYBAR_AV   ; /1 = Start Screen Location (Address)
     cmp YINDEXPOS
     beq @YPOSSAME
     pha                 ; Store Away New YINDEXPOS Temporarily
-    lda YBARCHARACTERS
-    ora #$80
+    lda YBARCHARACTERSFULL
+    ;ora #ORValue
     ldy #0
     sta (YSCRNLOC),y     ; Blank out last location
     pla                 ; Get back New YINDEXPOS
@@ -225,7 +235,7 @@ defm LIBBARSANDGAUGES_SHOWYBAR_AV   ; /1 = Start Screen Location (Address)
     iny
     ;sty $0400
     lda YBARCHARACTERS,y
-    ora #128
+    ;ora #ORValue
     ldy #0
     sta (YSCRNLOC),y
 endm
@@ -247,7 +257,7 @@ defm LIBBARSANDGAUGES_SHOWYGAUGE_AV ; /1 = Start Screen Location (Address)
     lda YGAUGECHARACTERS; Get first character from GAUGE Character Set
     cpy YGAUGEINDEX
     bcs @YGaugeClearFill
-    ora #$80
+    lda YGAUGECHARACTERSFULL
 @YGaugeClearFill
     ldy #0
     sta (YGAUGLOC),y    ; Blank out last location
@@ -274,7 +284,7 @@ defm LIBBARSANDGAUGES_SHOWYGAUGE_AV ; /1 = Start Screen Location (Address)
     tay                 ; Move to index register
     iny                 ; add 1
     lda YGAUGECHARACTERS,y  ; Get corresponding YGaugeCharacter From Set
-    eor #$80            ; invert the character
+    ;eor #ORValue            ; invert the character
     ldy #0              ; init Y
     sta (YGAUGLOC),y    ; store character on screen
 endm

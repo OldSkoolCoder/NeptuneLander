@@ -161,6 +161,9 @@ scDisplayScoringLocationH = $07D4
 scDisplayScoringLocationM = $07D6
 scDisplayScoringLocationL = $07D8
 
+idKeyboard = 1
+idJoystick = 2
+
 ;Peek(197) Codes
 scanCode_INS_DEL$ = 0
 scanCode_RET$ = 1

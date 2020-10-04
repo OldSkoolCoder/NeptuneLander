@@ -1,11 +1,11 @@
 glSetUpLunarSprite
-        lda #70
-        sta LunaLanderXLo
-        lda #60
-        sta LunaLanderY
-        lda #0
-        sta LunaLanderXHi
-        lda #0
+;        lda #70
+;        sta LunaLanderXLo
+;        lda #60
+;        sta LunaLanderY
+;        lda #0
+;        sta LunaLanderXHi
+;        lda #0
         sta LunaLanderSpNo
         lda #DarkGray
         sta LunaLanderColour
@@ -99,6 +99,79 @@ DidNotCollide
 
 glDebugReadInputAndUpdateVariables
 
+        lda InputDevice
+        cmp #idJoystick
+        bne @KeyboardInput
+        jsr glJoystickDebugInput
+        jmp @debugInformation
+
+@KeyboardInput
+        jsr libInput_ScanKeyboardMatrix
+
+        lda keyboardScanByte + 5
+        cmp #%01111111
+        bne @TestRight
+
+        LIBMATH_SUB16BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
+
+@TestRight
+        lda keyboardScanByte + 5
+        cmp #%11101111
+        bne @TestFire
+        LIBMATH_ADD16BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
+
+@TestFire
+        lda keyboardScanByte + 7
+        cmp #%11101111
+        bne @TestDone
+
+        LIBMATH_SUB8BIT_AAA LunaLanderY, DemoIncrement, LunaLanderY
+
+@TestDone
+        ;LIBINPUT_GETHELD GameportFireMask
+        ;bne @NoInput
+
+@debugInformation
+        lda #19
+        jsr krljmp_CHROUT$
+        ldx LunaLanderXLo
+        lda LunaLanderXHi
+        jsr $bdcd
+
+        lda #$20
+        jsr krljmp_CHROUT$
+        lda #44
+        jsr krljmp_CHROUT$
+
+        ldx LunaLanderY
+        lda #0
+        jsr $bdcd
+
+        lda #$20
+        jsr krljmp_CHROUT$
+        lda #44
+        jsr krljmp_CHROUT$
+
+        ldx CollidedWithBackground
+        lda #0
+        jsr $bdcd
+
+        lda #$20
+        jsr krljmp_CHROUT$
+        lda #44
+        jsr krljmp_CHROUT$
+
+        ldx keyboardScanByte + 5
+        lda #0
+        jsr $bdcd
+
+        lda #$20
+        jsr krljmp_CHROUT$
+
+@NoInput
+        rts
+
+glJoystickDebugInput
 @GetInput
         jsr libInputUpdate
 
@@ -129,33 +202,8 @@ glDebugReadInputAndUpdateVariables
 @TestFire
         ;LIBINPUT_GETHELD GameportFireMask
         ;bne @NoInput
-
-        lda #19
-        jsr krljmp_CHROUT$
-        ldx LunaLanderXLo
-        lda LunaLanderXHi
-        jsr $bdcd
-
-        lda #$20
-        jsr krljmp_CHROUT$
-        lda #44
-        jsr krljmp_CHROUT$
-
-        ldx LunaLanderY
-        lda #0
-        jsr $bdcd
-
-        lda #$20
-        jsr krljmp_CHROUT$
-        lda #44
-        jsr krljmp_CHROUT$
-
-        ldx CollidedWithBackground
-        lda #0
-        jsr $bdcd
-
-@NoInput
         rts
+
 
 glReadInputAndUpdateVariables
 

@@ -1,42 +1,30 @@
 ;*************************************************************************
 ; Jump Table for different Game Modes
-gfStatusJumpTableLo
-    BYTE <gfStatusMenu
-    BYTE <gfStatusInFlight
-    BYTE <gfStatusLanded
-    BYTE <gfStatusDying
-    BYTE <gfStatusDead
-    BYTE <gfSetUpSplashScreen
-    BYTE <gfGameRetry
-    BYTE <gfNextLevel
-    BYTE <gfUpdateScore
-    BYTE <gfInitialiseGame
-    BYTE <gfDifficultyChoice
-    BYTE <gfDiedButLetsTryAgain
-    BYTE <gfLostInSpace
-
-gfStatusJumpTableHi
-    BYTE >gfStatusMenu
-    BYTE >gfStatusInFlight
-    BYTE >gfStatusLanded
-    BYTE >gfStatusDying
-    BYTE >gfStatusDead
-    BYTE >gfSetUpSplashScreen
-    BYTE >gfGameRetry
-    BYTE >gfNextLevel
-    BYTE >gfUpdateScore
-    BYTE >gfInitialiseGame
-    BYTE >gfDifficultyChoice
-    BYTE >gfDiedButLetsTryAgain
-    BYTE >gfLostInSpace
+gfStatusJumpTable
+    WORD gfStatusMenu
+    WORD gfStatusInFlight
+    WORD gfStatusLanded
+    WORD gfStatusDying
+    WORD gfStatusDead
+    WORD gfSetUpSplashScreen
+    WORD gfGameRetry
+    WORD gfNextLevel
+    WORD gfUpdateScore
+    WORD gfInitialiseGame
+    WORD gfDifficultyChoice
+    WORD gfDiedButLetsTryAgain
+    WORD gfLostInSpace
 
 ;***********************************************************************
 ; Main Status Flow Routing Routine
 gfUpdateGameFlow
-    ldx GameStatus              ; Load Game Mode
-    lda gfStatusJumpTableLo,x   ; Get Low Jump Vector
+    lda GameStatus              ; Load Game Mode
+    asl                         ; x2
+    tax
+    lda gfStatusJumpTable,x     ; Get Low Jump Vector
     sta ZeroPageLow
-    lda gfStatusJumpTableHi,x   ; Get Hi Jump Vector
+    inx
+    lda gfStatusJumpTable,x     ; Get Hi Jump Vector
     sta ZeroPageHigh
 
     jmp (ZeroPageLow)           ; Jump To Game Mode Routine
@@ -51,7 +39,7 @@ gfInitialiseGame
 
     jsr libSoundInit
 
-    ldx #0 ; Level 1
+    ldx #3 ; Level 1
     ldy #0 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
     stx GameLevel
     sty GameDifficulty
@@ -415,9 +403,9 @@ gfNextLevel
     lda #0
     sta NumberOfSuccessfulLandings
 @StayOnSameLevel
+    jsr gsDisplayCurrentLevel
     ldx GameLevel
     ldy GameDifficulty
-    jsr gsDisplayCurrentLevel
     jsr gmSetUpGameVariables
     jsr glSetUpLunarSprite
     jsr gbSetUpFuelAndSpeedBars

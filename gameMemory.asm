@@ -228,6 +228,9 @@ NumberOfSuccessfulLandings
 DontResetFuel
         byte 0
 
+InputDevice
+        byte 0
+
 
         ;80 VV = 0 : G = 3/112 : T = 3/112 : HV = 0 : HI = 1/28
 gmSetUpGameVariables
@@ -465,6 +468,19 @@ gmSetUpGameVariables
         pla
         tay
 
+        iny
+        lda (ZeroPageLow2),y
+        sta LunaLanderXLo
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LunaLanderXHi
+
+        iny
+        lda (ZeroPageLow2),y
+        sta LunaLanderY
+
+
         ;jsr libPrint_PrintString
         ;jsr $AB1E
         ;LIBPRINT_PRINTSTRING_A LandScapeLocation
@@ -535,6 +551,7 @@ gmLevelArray
     word gmLevel1Array
     word gmLevel2Array
     word gmLevel3Array
+    word gmLevel4Array
 
 gmDifficultyArray
     word gmDifficultyEasy
@@ -558,6 +575,8 @@ gmLevel1Array
     byte 30,20,4    ; Pad 1 X, Y, Length
     byte 15,11,3    ; Pad 2 X, Y, Length
     byte 5,23,3    ; Pad 3 X, Y, Length
+    byte 60,0       ; Start X
+    byte 60         ; Start Y
 
 gmLevel2Array
     byte 68,0    ; Pad One Start X
@@ -576,6 +595,8 @@ gmLevel2Array
     byte 7,22,3    ; Pad 1 X, Y, Length
     byte 16,11,3    ; Pad 2 X, Y, Length
     byte 32,13,4    ; Pad 3 X, Y, Length
+    byte 60,0       ; Start X
+    byte 60         ; Start Y
 
 gmLevel3Array
     byte 49,0    ; Pad One Start X
@@ -594,6 +615,28 @@ gmLevel3Array
     byte 4,23,4    ; Pad 1 X, Y, Length
     byte 15,11,3    ; Pad 2 X, Y, Length
     byte 21,21,4    ; Pad 3 X, Y, Length
+    byte 60,0       ; Start X
+    byte 60         ; Start Y
+
+gmLevel4Array
+    byte 49,0    ; Pad One Start X
+    byte 61,0    ; Pad One Finish X
+    byte 107      ; Pad One Start Y
+    byte 108      ; Pad One Finish Y
+    byte 43,0    ; Pad Two Start X
+    byte 53,0    ; Pad Two Finish X
+    byte 211      ; Pad Two Start Y
+    byte 212      ; Pad Two Finish Y
+    byte 121,0    ; Pad Three Start X
+    byte 142,0    ; Pad Three Finish X
+    byte 187      ; Pad Three Start Y
+    byte 188      ; Pad Three Finish Y
+    word gmLevelFourLandscape
+    byte 4,9,3    ; Pad 1 X, Y, Length
+    byte 3,22,3    ; Pad 2 X, Y, Length
+    byte 13,19,4    ; Pad 3 X, Y, Length
+    byte 2,1       ; Start X
+    byte 161         ; Start Y
 
 gmDifficultyEasy
     byte 0,1,0    ; Gravity Frac, Gravity

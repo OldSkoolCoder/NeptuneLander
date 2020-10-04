@@ -21,6 +21,11 @@ gameportDiff            byte 0
 fireDelay               byte 0
 fireBlip                byte 1 ; reversed logic to match other input
 
+
+keyboardScanByte
+    byte 0,0,0,0,0,0,0,0
+
+
 ;===============================================================================
 ; Macros/Subroutines
 
@@ -101,3 +106,56 @@ defm    LIBINPUT_DELAY_V ; no. of y loops
         dey
         bne @loopy
         endm
+
+;=============================================================================
+defm    LIBINPUT_SCANKEYBRD_BIT     ; Acc = Bit To scan, Y = Result
+
+;                                   Parameters /1 = ResultLocation
+
+    rol
+    sta $DC00
+    ldy $DC01
+    sty /1
+    endm
+
+
+libInput_ScanKeyboardMatrix
+
+    ldy #0
+    lda #$FF
+@ClearMatrix
+    sta keyboardScanByte,y
+    iny
+    cpy #8
+    bne @ClearMatrix
+    
+    ldx #$FF
+    stx $DC02       ; Set Port A for Output
+    ldy #$00
+    sty $DC03       ; Set Port B for Input
+
+    sty $DC00       ; Key For Activity
+    cpx $DC01
+    beq @NoKeyboardActivity
+
+;    stx $DC00
+;    cpx $DC01
+;    bne @NoKeyboardActivity
+    
+    clc
+    lda #%11111111
+    LIBINPUT_SCANKEYBRD_BIT keyboardScanByte
+    LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 1 
+    LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 2 
+    LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 3 
+    LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 4 
+    LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 5 
+    LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 6 
+    LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 7
+
+;    stx $DC00
+;    cpx $DC01
+;    bne @NoKeyboardActivity
+
+@NoKeyboardActivity
+    rts

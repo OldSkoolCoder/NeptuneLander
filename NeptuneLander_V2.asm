@@ -42,8 +42,10 @@ GameStart
     lda #GF_Initialise             ; Initialise the Game
     sta GameStatus
 
-    ;lda #255
-    ;sta DemoMode
+    lda #255
+    sta DemoMode
+    lda #idKeyboard
+    sta InputDevice
 
 GameLoop
     LIBSCREEN_WAIT_V 240
@@ -74,4 +76,6 @@ incbin "NewLandScapeV2.sdd", 2, 2,CHAR
 gmLevelThreeLandscape
 incbin "NewLandScapeV2.sdd", 3, 3,CHAR
 
+gmLevelFourLandscape
+incbin "NewLandScapeV2.sdd", 4, 4,CHAR
 
