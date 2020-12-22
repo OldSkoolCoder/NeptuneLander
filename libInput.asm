@@ -23,7 +23,7 @@ fireBlip                byte 1 ; reversed logic to match other input
 
 
 keyboardScanByte
-    byte 0,0,0,0,0,0,0,0
+    byte 0,0,0,0,0,0,0,0,0
 
 
 ;===============================================================================
@@ -126,7 +126,7 @@ libInput_ScanKeyboardMatrix
 @ClearMatrix
     sta keyboardScanByte,y
     iny
-    cpy #8
+    cpy #9
     bne @ClearMatrix
     
     ldx #$FF
@@ -153,6 +153,16 @@ libInput_ScanKeyboardMatrix
     LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 6 
     LIBINPUT_SCANKEYBRD_BIT keyboardScanByte + 7
 
+    lda #$FF
+    and keyboardScanByte
+    and keyboardScanByte + 1
+    and keyboardScanByte + 2
+    and keyboardScanByte + 3
+    and keyboardScanByte + 4
+    and keyboardScanByte + 5
+    and keyboardScanByte + 6
+    and keyboardScanByte + 7
+    sta keyboardScanByte + 8
 ;    stx $DC00
 ;    cpx $DC01
 ;    bne @NoKeyboardActivity

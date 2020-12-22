@@ -14,6 +14,7 @@ gfStatusJumpTable
     WORD gfDifficultyChoice
     WORD gfDiedButLetsTryAgain
     WORD gfLostInSpace
+    WORD gfInputDeviceChoice
 
 ;***********************************************************************
 ; Main Status Flow Routing Routine
@@ -39,7 +40,7 @@ gfInitialiseGame
 
     jsr libSoundInit
 
-    ldx #3 ; Level 1
+    ldx #0 ; Level 1
     ldy #0 ; Easy=0 / Normal=1 / Hard=2 .... Difficulty
     stx GameLevel
     sty GameDifficulty
@@ -52,9 +53,59 @@ gfInitialiseGame
 ; Neptune Lander Title Splash Screen
 gfSetUpSplashScreen
     jsr gsScrollScreenDown      ; Scroll in the Title screen
+    lda #GF_AskInputDevice      ; Sets Input Device
+    ;lda #GF_Difficulty          ; Set game status to difficulty menu
+    sta GameStatus
+    lda #$93
+    jsr krljmp_CHROUT$
+    rts
+
+;**********************************************************************
+; Ask For Input Device, if not already set
+gfInputDeviceChoice
+    lda InputDevice
+    beq @AskUsersChoice
     lda #GF_Difficulty          ; Set game status to difficulty menu
     sta GameStatus
     rts
+
+@AskUsersChoice
+    jsr gsPleaseSelectInputDevice    ; Print input options
+
+@gfKeyboardCheck
+    lda LSTX                    ; load current key scan results
+    cmp #scanCode_NO_KEY$       ; Check for No Key Pressed
+    beq @gfKeyboardCheck        ; No Key was pressed
+
+    cmp #scanCode_K$            ; Keyboard (K)
+    bne @gfKeyTryJoyStick
+    jsr gsShowKeyboardInstructions
+    ldx #idKeyboard
+    jmp @gfInputDeviceSelected
+
+@gfKeyTryJoyStick
+    cmp #scanCode_J$            ; Joystick (J)
+    bne @gfKeyboardCheck
+    jsr gsShowJoystickInstructions
+    ldx #idJoystick
+    jmp @gfInputDeviceSelected
+
+@gfInputDeviceSelected
+    stx InputDevice
+
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+
+    lda #GF_Difficulty          ; Set game status to difficulty menu
+    sta GameStatus
+    rts
+
 
 ;**********************************************************************
 ; Initialise The Game for Playing
@@ -155,21 +206,6 @@ gfStatusInFlight
     jsr gbUpdateBarsAndGauges       ; Update Gauges and Bars
 
 gfGameLooper
-    jsr gfHaveWeSafelyLanded        ; check to see if we landed safely
-    bcc @gfSoFarNotLanded             ; clear carry means no successful landing
-
-    lda VerticalBarValue            ; load vertical velocity
-    cmp #8                          ; withing the green area?
-    bcc @gfLandedVelocityOK           ; Yes
-    jmp @gfConfirmCollided            ; No, we crashed
-
-@gfLandedVelocityOK
-    stx LandingPadNumber            ; Record which Landing Pad
-    lda #GF_Landed                  ; Change Game state to "Landed"
-    sta GameStatus
-    rts
-    
-@gfSoFarNotLanded
     jsr glDidWeCollideWithScene     ; have we colided with the scenry
     lda CollidedWithBackground      ; load collision flag
     cmp #False
@@ -190,6 +226,21 @@ gfGameLooper
 ;***********************************************************************
 ; Check Lander has not hit the status bars.
 @gfSpriteCollided
+    jsr gfHaveWeSafelyLanded        ; check to see if we landed safely
+    bcc @gfTestForGauges             ; clear carry means no successful landing
+
+    lda VerticalBarValue            ; load vertical velocity
+    cmp #8                          ; withing the green area?
+    bcc @gfLandedVelocityOK           ; Yes
+    jmp @gfConfirmCollided            ; No, we crashed
+
+@gfLandedVelocityOK
+    stx LandingPadNumber            ; Record which Landing Pad
+    lda #GF_Landed                  ; Change Game state to "Landed"
+    sta GameStatus
+    rts
+
+@gfTestForGauges
     lda LunaLanderXHi               ; have we hit the status bars
     cmp #1
     bne @gfConfirmCollided            ; Yes
@@ -297,13 +348,31 @@ gfStatusDying
 gfStatusDead
     ldy #>txtCaptainImAfraidWeDidNotMakeIt
     lda #<txtCaptainImAfraidWeDidNotMakeIt
-    jsr $AB1E
+    jsr libPrint_PrintString
     
+    lda InputDevice
+    cmp #idKeyboard
+    beq @gsKeyboardTest
+
+    ldy #>txtPressFiretoStart
+    lda #<txtPressFiretoStart
+    jsr libPrint_PrintString
+
     jsr libInputUpdate
-
     LIBINPUT_GETHELD GameportFireMask
-    bne @gfNoGameReset
+    bne gfNoGameReset
+    jmp gsSpaceorFire
 
+@gsKeyboardTest
+    ldy #>txtPressSpaceToStart
+    lda #<txtPressSpaceToStart
+    jsr libPrint_PrintString
+
+    lda 197
+    cmp #scanCode_SPACEBAR$
+    bne gfNoGameReset
+
+gsSpaceorFire
     LIBSPRITE_DIDCOLLIDEWITHDATA_A LunaLanderSpNo
 
     lda #False
@@ -317,13 +386,13 @@ gfStatusDead
     
     lda #GF_Title
     sta GameStatus
-    jmp @gfNoGameReset
+    jmp gfNoGameReset
 
 @gfStillFuelRemaining
     lda #GF_DiedSoTryAgain
     sta GameStatus
 
-@gfNoGameReset
+gfNoGameReset
     rts
 
 gfHaveWeSafelyLanded
@@ -343,6 +412,7 @@ gfHaveWeSafelyLanded
 ;        stx 1026
 
     ldx #$00
+    ;LIBLUNA_DEBUGCHECKLANDINGSITE_AAA LandingPadThreeXStart, LandingPadThreeXFinish, LandingPadThreeYStart
     LIBLUNA_CHECKLANDINGSITE_AAA LandingPadThreeXStart, LandingPadThreeXFinish, LandingPadThreeYStart
     bcc @gfTestSecondLandSite
     ldx #$03
@@ -458,7 +528,7 @@ gfTankEmptied
 gfLostInSpace
     ldy #>txtLostInSpace
     lda #<txtLostInSpace
-    jsr $AB1E
+    jsr libPrint_PrintString
     
     LIBINPUT_DELAY_V 255
     LIBINPUT_DELAY_V 255

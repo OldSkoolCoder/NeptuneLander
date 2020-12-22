@@ -117,6 +117,9 @@ GameStatus
 DemoMode
         BYTE 0          ; 0 = Game Mode / 255 = Demo Mode
 
+DemoColour
+        BYTE 7
+
 DemoIncrement
         BYTE 1
 
@@ -329,69 +332,69 @@ gmSetUpGameVariables
         sta ZeroPageHigh2
 
         ldy #0
-        lda (ZeroPageLow2),y            ; Pad 1 Landing X Start
-        sta LandingPadOneXStart
-        iny
-        lda (ZeroPageLow2),y
-        sta LandingPadOneXStart + 1
+        ;lda (ZeroPageLow2),y            ; Pad 1 Landing X Start
+        ;sta LandingPadOneXStart
+        ;iny
+        ;lda (ZeroPageLow2),y
+        ;sta LandingPadOneXStart + 1
 
-        iny
-        lda (ZeroPageLow2),y            ; Pad 1 Landing X Finish
-        sta LandingPadOneXFinish        
-        iny
-        lda (ZeroPageLow2),y
-        sta LandingPadOneXFinish + 1
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 1 Landing X Finish
+        ;sta LandingPadOneXFinish        
+        ;iny
+        ;lda (ZeroPageLow2),y
+        ;sta LandingPadOneXFinish + 1
 
-        iny
-        lda (ZeroPageLow2),y            ; Pad 1 Landing Y Start
-        sta LandingPadOneYStart
-        iny
-        lda (ZeroPageLow2),y            ; Pad 1 Landing Y Finish
-        sta LandingPadOneYFinish
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 1 Landing Y Start
+        ;sta LandingPadOneYStart
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 1 Landing Y Finish
+        ;sta LandingPadOneYFinish
 
-        iny
-        lda (ZeroPageLow2),y
-        sta LandingPadTwoXStart         ; Pad 2 Landing X Start
-        iny
-        lda (ZeroPageLow2),y
-        sta LandingPadTwoXStart + 1
+        ;iny
+        ;lda (ZeroPageLow2),y
+        ;sta LandingPadTwoXStart         ; Pad 2 Landing X Start
+        ;iny
+        ;lda (ZeroPageLow2),y
+        ;sta LandingPadTwoXStart + 1
 
-        iny
-        lda (ZeroPageLow2),y
-        sta LandingPadTwoXFinish        ; Pad 2 Landing X Finish
-        iny
-        lda (ZeroPageLow2),y
-        sta LandingPadTwoXFinish + 1
+        ;iny
+        ;lda (ZeroPageLow2),y
+        ;sta LandingPadTwoXFinish        ; Pad 2 Landing X Finish
+        ;iny
+        ;lda (ZeroPageLow2),y
+        ;sta LandingPadTwoXFinish + 1
 
-        iny
-        lda (ZeroPageLow2),y            ; Pad 2 Landing Y Start
-        sta LandingPadTwoYStart
-        iny
-        lda (ZeroPageLow2),y            ; Pad 2 Landing Y Finish
-        sta LandingPadTwoYFinish
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 2 Landing Y Start
+        ;sta LandingPadTwoYStart
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 2 Landing Y Finish
+        ;sta LandingPadTwoYFinish
 
-        iny
-        lda (ZeroPageLow2),y            ; Pad 3 Landing X Start
-        sta LandingPadThreeXStart
-        iny
-        lda (ZeroPageLow2),y
-        sta LandingPadThreeXStart + 1
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 3 Landing X Start
+        ;sta LandingPadThreeXStart
+        ;iny
+        ;lda (ZeroPageLow2),y
+        ;sta LandingPadThreeXStart + 1
 
-        iny
-        lda (ZeroPageLow2),y            ; Pad 3 Landing X Finish
-        sta LandingPadThreeXFinish
-        iny
-        lda (ZeroPageLow2),y
-        sta LandingPadThreeXFinish + 1
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 3 Landing X Finish
+        ;sta LandingPadThreeXFinish
+        ;iny
+        ;lda (ZeroPageLow2),y
+        ;sta LandingPadThreeXFinish + 1
 
-        iny
-        lda (ZeroPageLow2),y            ; Pad 3 Landing Y Start
-        sta LandingPadThreeYStart
-        iny
-        lda (ZeroPageLow2),y            ; Pad 3 Landing Y Finish
-        sta LandingPadThreeYFinish
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 3 Landing Y Start
+        ;sta LandingPadThreeYStart
+        ;iny
+        ;lda (ZeroPageLow2),y            ; Pad 3 Landing Y Finish
+        ;sta LandingPadThreeYFinish
 
-        iny
+        ;iny
         lda (ZeroPageLow2),y            ; Level Landscape Lo Byte
         sta LandScapeLocation
         iny
@@ -404,9 +407,13 @@ gmSetUpGameVariables
         lda #$93
         jsr krljmp_CHROUT$
 
-        ldy LandScapeLocation + 1
-        lda LandScapeLocation
-        jsr libScreen_CopyMap
+        ;ldy LandScapeLocation + 1
+        ;lda LandScapeLocation
+        ;jsr libScreen_CopyMap
+
+        lda LandScapeLocation + 1
+        ldy LandScapeLocation
+        jsr libScreen_DecodeMap
 
         pla
         tay
@@ -422,11 +429,49 @@ gmSetUpGameVariables
         iny
         lda (ZeroPageLow2),y
         sta ZeroPageParam7          ; How Many
+        sta ZeroPageParam8          
 
         tya
         pha
         lda #Red
         jsr libScreen_SetColour
+
+        lda ZeroPageParam5
+        sta LandingPadOneXStart
+        sta LandingPadOneXFinish
+
+        lda ZeroPageParam6
+        sta LandingPadOneXStart + 1
+        sta LandingPadOneXFinish + 1
+
+        ; Adding X Offset to start and finish
+        lda LandingPadOneXStart
+        sec
+        sbc #9
+        sta LandingPadOneXStart
+        lda LandingPadOneXStart + 1
+        sbc #0
+        sta LandingPadOneXStart + 1
+
+        lda ZeroPageParam8
+        asl
+        asl
+        asl
+        clc
+        adc #9
+        
+        clc
+        adc LandingPadOneXFinish
+        sta LandingPadOneXFinish
+        lda LandingPadOneXFinish + 1
+        adc #0
+        sta LandingPadOneXFinish + 1
+
+        lda ZeroPageParam7        
+        sta LandingPadOneYStart
+        sta LandingPadOneYFinish
+        dec LandingPadOneYStart
+
         pla
         tay
 
@@ -441,11 +486,49 @@ gmSetUpGameVariables
         iny
         lda (ZeroPageLow2),y
         sta ZeroPageParam7          ; How Many
+        sta ZeroPageParam8          
 
         tya
         pha
         lda #Red
         jsr libScreen_SetColour
+
+        lda ZeroPageParam5
+        sta LandingPadTwoXStart
+        sta LandingPadTwoXFinish
+
+        lda ZeroPageParam6
+        sta LandingPadTwoXStart + 1
+        sta LandingPadTwoXFinish + 1
+
+        ; Adding X Offset to start and finish
+        lda LandingPadTwoXStart
+        sec
+        sbc #9
+        sta LandingPadTwoXStart
+        lda LandingPadTwoXStart + 1
+        sbc #0
+        sta LandingPadTwoXStart + 1
+
+        lda ZeroPageParam8
+        asl
+        asl
+        asl
+        clc
+        adc #9
+        
+        clc
+        adc LandingPadTwoXFinish
+        sta LandingPadTwoXFinish
+        lda LandingPadTwoXFinish + 1
+        adc #0
+        sta LandingPadTwoXFinish + 1
+
+        lda ZeroPageParam7        
+        sta LandingPadTwoYStart
+        sta LandingPadTwoYFinish
+        dec LandingPadTwoYStart
+
         pla
         tay
 
@@ -460,11 +543,49 @@ gmSetUpGameVariables
         iny
         lda (ZeroPageLow2),y
         sta ZeroPageParam7          ; How Many
+        sta ZeroPageParam8          
 
         tya
         pha
         lda #Red
         jsr libScreen_SetColour
+
+        lda ZeroPageParam5
+        sta LandingPadThreeXStart
+        sta LandingPadThreeXFinish
+
+        lda ZeroPageParam6
+        sta LandingPadThreeXStart + 1
+        sta LandingPadThreeXFinish + 1
+
+        ; Adding X Offset to start and finish
+        lda LandingPadThreeXStart
+        sec
+        sbc #9
+        sta LandingPadThreeXStart
+        lda LandingPadThreeXStart + 1
+        sbc #0
+        sta LandingPadThreeXStart + 1
+
+        lda ZeroPageParam8
+        asl
+        asl
+        asl
+        clc
+        adc #9
+        
+        clc
+        adc LandingPadThreeXFinish
+        sta LandingPadThreeXFinish
+        lda LandingPadThreeXFinish + 1
+        adc #0
+        sta LandingPadThreeXFinish + 1
+
+        lda ZeroPageParam7        
+        sta LandingPadThreeYStart
+        sta LandingPadThreeYFinish
+        dec LandingPadThreeYStart
+
         pla
         tay
 
@@ -539,7 +660,7 @@ gmSetUpCustomCharacters
 gmSetUpScoringDisplay
     ldy #>txtCurrentScore
     lda #<txtCurrentScore
-    jsr $AB1E
+    jsr libPrint_PrintString
 
     ;LIBSCORING_DISPLAYSCORE_AA ScoreBoard, scDisplayScoringLocation
     LIBSCORING_DISPLAYSCORESET_AA ScoreBoard + 2, scDisplayScoringLocationH
@@ -559,38 +680,38 @@ gmDifficultyArray
     word gmDifficultyHard
 
 gmLevel1Array
-    byte 57,0    ; Pad One Start X
-    byte 70,0    ; Pad One Finish X
-    byte 219      ; Pad One Start Y
-    byte 220      ; Pad One Finish Y
-    byte 135,0    ; Pad Two Start X
-    byte 150,0    ; Pad Two Finish X
-    byte 123      ; Pad Two Start Y
-    byte 124      ; Pad Two Finish Y
-    byte $01,$01    ; Pad Three Start X (257)
-    byte $17,$01    ; Pad Three Finish X (279)
-    byte 195      ; Pad Three Start Y
-    byte 195      ; Pad Three Finish Y
+;    byte 57,0    ; Pad One Start X
+;    byte 70,0    ; Pad One Finish X
+;    byte 219      ; Pad One Start Y
+;    byte 220      ; Pad One Finish Y
+;    byte 135,0    ; Pad Two Start X
+;    byte 150,0    ; Pad Two Finish X
+;    byte 123      ; Pad Two Start Y
+;    byte 124      ; Pad Two Finish Y
+;    byte $01,$01    ; Pad Three Start X (257)
+;    byte $17,$01    ; Pad Three Finish X (279)
+;    byte 195      ; Pad Three Start Y
+;    byte 195      ; Pad Three Finish Y
     word gmLevelOneLandscape
-    byte 30,20,4    ; Pad 1 X, Y, Length
+    byte 5,23,3     ; Pad 1 X, Y, Length
     byte 15,11,3    ; Pad 2 X, Y, Length
-    byte 5,23,3    ; Pad 3 X, Y, Length
+    byte 30,20,4    ; Pad 3 X, Y, Length
     byte 60,0       ; Start X
     byte 60         ; Start Y
 
 gmLevel2Array
-    byte 68,0    ; Pad One Start X
-    byte 87,0    ; Pad One Finish X
-    byte 211      ; Pad One Start Y
-    byte 212      ; Pad One Finish Y
-    byte 145,0    ; Pad Two Start X
-    byte 159,0    ; Pad Two Finish X
-    byte 123      ; Pad Two Start Y
-    byte 124      ; Pad Two Finish Y
-    byte $11,$01    ; Pad Three Start X
-    byte $28,$01    ; Pad Three Finish X
-    byte 139      ; Pad Three Start Y
-    byte 140      ; Pad Three Finish Y
+;    byte 68,0    ; Pad One Start X
+;    byte 87,0    ; Pad One Finish X
+;    byte 211      ; Pad One Start Y
+;    byte 212      ; Pad One Finish Y
+;    byte 145,0    ; Pad Two Start X
+;    byte 159,0    ; Pad Two Finish X
+;    byte 123      ; Pad Two Start Y
+;    byte 124      ; Pad Two Finish Y
+;    byte $11,$01    ; Pad Three Start X
+;    byte $28,$01    ; Pad Three Finish X
+;    byte 139      ; Pad Three Start Y
+;    byte 140      ; Pad Three Finish Y
     word gmLevelTwoLandscape
     byte 7,22,3    ; Pad 1 X, Y, Length
     byte 16,11,3    ; Pad 2 X, Y, Length
@@ -599,18 +720,18 @@ gmLevel2Array
     byte 60         ; Start Y
 
 gmLevel3Array
-    byte 49,0    ; Pad One Start X
-    byte 70,0    ; Pad One Finish X
-    byte 219      ; Pad One Start Y
-    byte 220      ; Pad One Finish Y
-    byte 137,0    ; Pad Two Start X
-    byte 151,0    ; Pad Two Finish X
-    byte 123      ; Pad Two Start Y
-    byte 124      ; Pad Two Finish Y
-    byte 185,0    ; Pad Three Start X
-    byte 205,0    ; Pad Three Finish X
-    byte 203      ; Pad Three Start Y
-    byte 204      ; Pad Three Finish Y
+;    byte 49,0    ; Pad One Start X
+;    byte 70,0    ; Pad One Finish X
+;    byte 219      ; Pad One Start Y
+;    byte 220      ; Pad One Finish Y
+;    byte 137,0    ; Pad Two Start X
+;    byte 151,0    ; Pad Two Finish X
+;    byte 123      ; Pad Two Start Y
+;    byte 124      ; Pad Two Finish Y
+;    byte 185,0    ; Pad Three Start X
+;    byte 205,0    ; Pad Three Finish X
+;    byte 203      ; Pad Three Start Y
+;    byte 204      ; Pad Three Finish Y
     word gmLevelThreeLandscape
     byte 4,23,4    ; Pad 1 X, Y, Length
     byte 15,11,3    ; Pad 2 X, Y, Length
@@ -619,18 +740,18 @@ gmLevel3Array
     byte 60         ; Start Y
 
 gmLevel4Array
-    byte 49,0    ; Pad One Start X
-    byte 61,0    ; Pad One Finish X
-    byte 107      ; Pad One Start Y
-    byte 108      ; Pad One Finish Y
-    byte 43,0    ; Pad Two Start X
-    byte 53,0    ; Pad Two Finish X
-    byte 211      ; Pad Two Start Y
-    byte 212      ; Pad Two Finish Y
-    byte 121,0    ; Pad Three Start X
-    byte 142,0    ; Pad Three Finish X
-    byte 187      ; Pad Three Start Y
-    byte 188      ; Pad Three Finish Y
+;    byte 49,0    ; Pad One Start X
+;    byte 61,0    ; Pad One Finish X
+;    byte 107      ; Pad One Start Y
+;    byte 108      ; Pad One Finish Y
+;    byte 43,0    ; Pad Two Start X
+;    byte 53,0    ; Pad Two Finish X
+;    byte 211      ; Pad Two Start Y
+;    byte 212      ; Pad Two Finish Y
+;    byte 121,0    ; Pad Three Start X
+;    byte 142,0    ; Pad Three Finish X
+;    byte 187      ; Pad Three Start Y
+;    byte 188      ; Pad Three Finish Y
     word gmLevelFourLandscape
     byte 4,9,3    ; Pad 1 X, Y, Length
     byte 3,22,3    ; Pad 2 X, Y, Length
@@ -693,7 +814,15 @@ txtHoustonTheEagleHasLanded
     byte 0
 
 txtCaptainImAfraidWeDidNotMakeIt
-    text "{home}{down*21}{right*6}{yellow}eagle, come in eagle, eagle!{down*2}{left*27}press fire to start again!"
+    text "{home}{down*21}{right*6}{yellow}eagle, come in eagle, eagle!"
+    byte 0
+
+txtPressSpaceToStart
+    text "{down*2}{left*27}press space to start again!"
+    byte 0
+
+txtPressFiretoStart
+    text "{down*2}{left*27}press fire to start again!"
     byte 0
 
 txtNeptuneLanderTitle1
@@ -705,11 +834,15 @@ txtNeptuneLanderTitle2
     byte 0
 
 txtNeptuneLanderTitle3
+    text "{home}{down*23}{right*10}{yellow}press space to start{white}"
+    byte 0
+
+txtNeptuneLanderTitle4
     text "{home}{down*23}{right*10}{yellow}press fire to start{white}"
     byte 0
 
 txtWhichDifficultyLevel
-    text "{clear}{down*10}"
+    text "{home}{down*10}"
     text "{right*4} easy (e){return}{down}"
     text "{right*4} normal (n){return}{down}"
     text "{right*4} hard (h){return}{down}"
@@ -722,6 +855,21 @@ txtLevelNotification
 
 txtLostInSpace
     text "{home}{yellow}{down*5}{right*12}danger, danger,{return}{right*8}they are lost in space."
+    byte 0
+
+txtWhichInputDevice
+    text "{clear}{down*3}"
+    text " please select ({red}k{white})eyboard or ({red}j{white})oystick"
+    byte 0
+
+txtKeyboardDevice
+    text "{home}{down*5}"
+    text " '<' = left, space=thrust, '>' = right"
+    byte 0
+
+txtJoystickDevice
+    text "{home}{down*5}"
+    text "{right*7}please use joystick port 2"
     byte 0
 
 ;@LevelOneEasyLandscape

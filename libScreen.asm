@@ -789,8 +789,95 @@ libScreen_SetColour
     inx
     cpx ZeroPageParam7
     bne @Looper
+
+    ; Work Out Y Platform Pixel for sprite
+    lda ZeroPageParam6
+    asl             ; *2
+    asl             ; *4
+    asl             ; *8
+
+    clc
+    adc #07        ; upto pixel line on base
+    adc #50         ; Sprite start Coordinate
+
+    sec
+    sbc #21         ; subtract Sprite Height
+    sta ZeroPageParam7  ; Final Y Line
+    
+    ; Work Out X Platform Pixel for sprite
+    lda #0
+    sta ZeroPageParam6
+    lda ZeroPageParam5
+    asl             ; *2
+    asl             ; *4
+    asl             ; *8
+    rol ZeroPageParam6
+
+    clc
+    adc #24        ; Sprite Start Coordinate
+    sta ZeroPageParam5  ; Final X Position
+
+    bcc @DontInc6
+    inc ZeroPageParam6
+
+@DontInc6
     rts
 
-    
+;==============================================================================
+; Input Params : Acc = Hi Location, Y = Lo Location
+libScreen_DecodeMap
 
+    sty @LoadMapByte + 1
+    sta @LoadMapByte + 2
 
+    iny
+    bne @ByPassHiAddition
+    adc #1
+
+@ByPassHiAddition
+    sty @LoadMapLength + 1
+    sta @LoadMapLength + 2
+
+    lda #<SCREENRAM 
+    sta @StoreMap + 1
+    lda #>SCREENRAM
+    sta @StoreMap + 2
+
+@LoadMapLength
+    ldx $BABE
+    beq @ExitDecoder
+
+@LoadMapByte
+    lda $BEEF
+
+@StoreMap
+    sta $B00B
+
+    inc @StoreMap + 1
+    bne @GetNextChar
+    inc @StoreMap + 2
+
+@GetNextChar
+    dex
+    bne @StoreMap
+
+    clc
+    lda @LoadMapLength + 1
+    adc #2
+    sta @LoadMapLength + 1
+    lda @LoadMapLength + 2
+    adc #0
+    sta @LoadMapLength + 2
+
+    clc
+    lda @LoadMapByte + 1
+    adc #2
+    sta @LoadMapByte + 1
+    lda @LoadMapByte + 2
+    adc #0
+    sta @LoadMapByte + 2
+
+    jmp @LoadMapLength
+
+@ExitDecoder
+    rts

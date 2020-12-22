@@ -6,7 +6,7 @@ gsPrepareToLanderCaptain
 
     ldy #>txtPrepareToLandCaptain
     lda #<txtPrepareToLandCaptain
-    jsr $AB1E
+    jsr libPrint_PrintString
     
     rts
 
@@ -15,7 +15,7 @@ gsPrepareToLanderCaptain
 gsTheEagleHasLanded
     ldy #>txtHoustonTheEagleHasLanded
     lda #<txtHoustonTheEagleHasLanded
-    jmp $AB1E
+    jmp libPrint_PrintString
 
 ;********************************************************
 ; This scrolls the middle section down one row on the
@@ -165,21 +165,73 @@ gsScrollLooper
 
     ldy #>txtNeptuneLanderTitle1
     lda #<txtNeptuneLanderTitle1
-    jsr $AB1E
+    jsr libPrint_PrintString
 
     ldy #>txtNeptuneLanderTitle2
     lda #<txtNeptuneLanderTitle2
-    jsr $AB1E
+    jsr libPrint_PrintString
 
-    ldy #>txtNeptuneLanderTitle3
-    lda #<txtNeptuneLanderTitle3
-    jsr $AB1E
+    lda InputDevice
+    cmp #idJoystick
+    bne @gsKeyboardinstead
+    ldy #>txtNeptuneLanderTitle4
+    lda #<txtNeptuneLanderTitle4
+    jsr libPrint_PrintString
 
-@gsScanAgain
+@gsScanJoyStickAgain
     jsr libInputUpdate
 
     LIBINPUT_GETHELD GameportFireMask
-    bne @gsScanAgain
+    bne @gsScanJoyStickAgain
+    rts
+
+@gsKeyboardinstead
+    ldy #>txtNeptuneLanderTitle3
+    lda #<txtNeptuneLanderTitle3
+    jsr libPrint_PrintString
+
+gsScanKeyboardAgain
+    lda 197
+    cmp #scanCode_SPACEBAR$
+    bne @gsTestLeftArrow
+    jmp gsSpacePressed
+@gsTestLeftArrow
+    cmp #scanCode_LEFT_ARROW$
+    bne gsScanKeyboardAgain
+    lda DemoMode
+    eor #$FF
+    sta DemoMode
+
+    ldy #0
+@gsScreenColourDemoLooper
+    lda $D880,y
+    and #$0F
+    cmp DemoColour
+    bne @gsTestSecodArea
+    eor #$0D
+    sta $D880,y
+
+@gsTestSecodArea
+    lda $D980,y
+    and #$0F
+    cmp DemoColour
+    bne @gsLoopBackRound
+    eor #$0D
+    sta $D980,y
+
+@gsLoopBackRound
+    iny
+    bne @gsScreenColourDemoLooper
+
+    lda DemoColour
+    eor #$0D
+    sta DemoColour
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    LIBINPUT_DELAY_V 255
+    jmp gsScanKeyboardAgain
+
+gsSpacePressed
     rts
 
 ;********************************************************
@@ -188,14 +240,14 @@ gsPleaseSelectDifficulty
 
     ldy #>txtWhichDifficultyLevel
     lda #<txtWhichDifficultyLevel
-    jmp $AB1E
+    jmp libPrint_PrintString
 
 ;********************************************************
 ;* Display "The Current Level"
 gsDisplayCurrentLevel
     ldy #>txtLevelNotification
     lda #<txtLevelNotification
-    jsr $AB1E
+    jsr libPrint_PrintString
     lda GameLevel
     clc
     adc #$31
@@ -211,4 +263,30 @@ gsDisplayCurrentLevel
     LIBINPUT_DELAY_V 255
 
     rts
+
+;********************************************************
+;* Display "Please select (k)eyboard or (j)oystick"
+gsPleaseSelectInputDevice
+
+    ldy #>txtWhichInputDevice
+    lda #<txtWhichInputDevice
+    jmp libPrint_PrintString
+
+;********************************************************
+;* Display keybaord instructions
+gsShowKeyboardInstructions
+
+    ldy #>txtKeyboardDevice
+    lda #<txtKeyboardDevice
+    jmp libPrint_PrintString
+
+;********************************************************
+;* Display joystick instructions
+gsShowJoystickInstructions
+
+    ldy #>txtJoystickDevice
+    lda #<txtJoystickDevice
+    jmp libPrint_PrintString
+
+
 

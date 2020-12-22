@@ -4,7 +4,7 @@
   <BK1>07</BK1>
   <BK2>77</BK2>
   <Col3>37</Col3>
-  <Reversed>True</Reversed>
+  <Reversed>False</Reversed>
   <Multicolour>False</Multicolour>
   <Uppercase>True</Uppercase>
   <character>
@@ -803,14 +803,14 @@
   <character>
     <charcode>62</charcode>
     <chardata>
-      <data>0</data>
-      <data>0</data>
       <data>112</data>
       <data>24</data>
       <data>12</data>
       <data>7</data>
       <data>14</data>
       <data>28</data>
+      <data>112</data>
+      <data>0</data>
     </chardata>
   </character>
   <character>

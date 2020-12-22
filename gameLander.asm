@@ -101,37 +101,14 @@ glDebugReadInputAndUpdateVariables
 
         lda InputDevice
         cmp #idJoystick
-        bne @KeyboardInput
+        bne @glKeyboardInput
         jsr glJoystickDebugInput
-        jmp @debugInformation
+        jmp @glDebugInformation
 
-@KeyboardInput
-        jsr libInput_ScanKeyboardMatrix
+@glKeyboardInput
+        jsr glKeyboardDebugInput
 
-        lda keyboardScanByte + 5
-        cmp #%01111111
-        bne @TestRight
-
-        LIBMATH_SUB16BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
-
-@TestRight
-        lda keyboardScanByte + 5
-        cmp #%11101111
-        bne @TestFire
-        LIBMATH_ADD16BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
-
-@TestFire
-        lda keyboardScanByte + 7
-        cmp #%11101111
-        bne @TestDone
-
-        LIBMATH_SUB8BIT_AAA LunaLanderY, DemoIncrement, LunaLanderY
-
-@TestDone
-        ;LIBINPUT_GETHELD GameportFireMask
-        ;bne @NoInput
-
-@debugInformation
+@glDebugInformation
         lda #19
         jsr krljmp_CHROUT$
         ldx LunaLanderXLo
@@ -204,6 +181,30 @@ glJoystickDebugInput
         ;bne @NoInput
         rts
 
+glKeyboardDebugInput
+        jsr libInput_ScanKeyboardMatrix
+
+        lda keyboardScanByte + 5
+        cmp #%01111111
+        bne @TestRight
+
+        LIBMATH_SUB16BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
+
+@TestRight
+        lda keyboardScanByte + 5
+        cmp #%11101111
+        bne @TestFire
+        LIBMATH_ADD16BIT_AAA LunaLanderXLo, DemoIncrement, LunaLanderXLo
+
+@TestFire
+        lda keyboardScanByte + 7
+        cmp #%11101111
+        bne @TestDone
+
+        LIBMATH_SUB8BIT_AAA LunaLanderY, DemoIncrement, LunaLanderY
+
+@TestDone
+    rts
 
 glReadInputAndUpdateVariables
 
@@ -215,54 +216,24 @@ glReadInputAndUpdateVariables
         jmp @FuelRanOut
 
 @GetInput
-        jsr libInputUpdate
+        lda InputDevice
+        cmp #idJoystick
+        bne @glKeyboardInput
+        jsr glReadJoystickAndUpdateVariables
+        jmp @InputProcessed
 
-        LIBINPUT_GETHELD GameportLeftMask
-        bne @TestRight
+@glKeyboardInput
+        jsr glReadKeyboardAndUpdateVariables
+        jmp @InputProcessed
 
-        ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
-        LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
-        jsr glSoundSideThrust
-        ldx SpriteThrustLeftNo
-        stx ManuoverFrameNo
-        jsr gmAddFuelConsumption
-
-@TestRight
-        LIBINPUT_GETHELD GameportRightMask
-        bne @TestFire
-
-        ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
-        LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
-        jsr glSoundSideThrust
-        ldx SpriteThrustRightNo
-        stx ManuoverFrameNo
-        jsr gmAddFuelConsumption
-
-@TestFire
-        LIBINPUT_GETHELD GameportFireMask
-        bne @NoInput
-
-        ;110 IF A = 22 THEN VV = VV - T : TS=183 : 
-@FireDetected
-        LIBMATH_SUB24BIT_AAA VerticalVelocityFracLo, ThrustFracLo, VerticalVelocityFracLo
-        jsr glSoundMainThrust
-        ldx SpriteThrustNo
-        stx ThrustFrameNo
-        jsr gmAddFuelConsumption
-        jsr gmAddFuelConsumption
-        jmp @GravityByPass
-
-@NoInput
-        LIBINPUT_GETHELD GameportNoInputMask
-        cmp #GameportNoInputMask
-        bne @InputProcessed
 @FuelRanOut
         ldx #spNoThrust
         stx ThrustFrameNo
         stx ManuoverFrameNo
 
-        ;200 VV = VV + G : IF VV > 2 THEN VV = 2
 @InputProcessed
+        clc
+        bcs @GravityByPass
         ldx GameStatus
         cpx #GF_Dead
         beq @GravityByPass
@@ -300,3 +271,110 @@ glSoundSideThrust
 glSoundMainThrust
     LIBSOUND_PLAY_VAA 1, soundMainThrustHigh, soundMainThrustLow
     rts
+
+glReadJoystickAndUpdateVariables
+        jsr libInputUpdate
+
+        LIBINPUT_GETHELD GameportLeftMask
+        bne @TestRight
+
+        ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
+        LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        jsr glSoundSideThrust
+        ldx SpriteThrustLeftNo
+        stx ManuoverFrameNo
+        jsr gmAddFuelConsumption
+
+@TestRight
+        LIBINPUT_GETHELD GameportRightMask
+        bne @TestFire
+
+        ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
+        LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        jsr glSoundSideThrust
+        ldx SpriteThrustRightNo
+        stx ManuoverFrameNo
+        jsr gmAddFuelConsumption
+
+@TestFire
+        LIBINPUT_GETHELD GameportFireMask
+        bne @NoInput
+
+        ;110 IF A = 22 THEN VV = VV - T : TS=183 : 
+@FireDetected
+        LIBMATH_SUB24BIT_AAA VerticalVelocityFracLo, ThrustFracLo, VerticalVelocityFracLo
+        jsr glSoundMainThrust
+        ldx SpriteThrustNo
+        stx ThrustFrameNo
+        jsr gmAddFuelConsumption
+        jsr gmAddFuelConsumption
+        sec
+        jmp @InputProcessed + 1
+        ;jmp @GravityByPass
+
+@NoInput
+        LIBINPUT_GETHELD GameportNoInputMask
+        cmp #GameportNoInputMask
+        bne @InputProcessed
+        ldx #spNoThrust
+        stx ThrustFrameNo
+        stx ManuoverFrameNo
+
+@InputProcessed
+        clc
+        rts
+
+glReadKeyboardAndUpdateVariables
+        jsr libInput_ScanKeyboardMatrix
+
+        lda keyboardScanByte + 5
+        cmp #%01111111
+        bne @TestRight
+
+        ;130 IF A = 10 THEN HV = HV + HI : TS = 185 :REM A
+        LIBMATH_ADD16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        jsr glSoundSideThrust
+        ldx SpriteThrustLeftNo
+        stx ManuoverFrameNo
+        jsr gmAddFuelConsumption
+
+@TestRight
+        lda keyboardScanByte + 5
+        cmp #%11101111
+        bne @TestFire
+
+        ;120 IF A = 18 THEN HV = HV - HI : TS = 184 : REM D
+        LIBMATH_SUB16BIT_AAA HorizontalVelocityFrac, HorizontalInertiaFrac, HorizontalVelocityFrac
+        jsr glSoundSideThrust
+        ldx SpriteThrustRightNo
+        stx ManuoverFrameNo
+        jsr gmAddFuelConsumption
+
+@TestFire
+        lda keyboardScanByte + 7
+        cmp #%11101111
+        bne @NoInput
+
+        ;110 IF A = 22 THEN VV = VV - T : TS=183 : 
+@FireDetected
+        LIBMATH_SUB24BIT_AAA VerticalVelocityFracLo, ThrustFracLo, VerticalVelocityFracLo
+        jsr glSoundMainThrust
+        ldx SpriteThrustNo
+        stx ThrustFrameNo
+        jsr gmAddFuelConsumption
+        jsr gmAddFuelConsumption
+        sec
+        jmp @InputProcessed + 1
+        ;jmp @GravityByPass
+
+@NoInput
+        lda keyboardScanByte + 8
+        cmp #%11111111
+        bne @InputProcessed
+        ldx #spNoThrust
+        stx ThrustFrameNo
+        stx ManuoverFrameNo
+
+@InputProcessed
+        clc
+        rts

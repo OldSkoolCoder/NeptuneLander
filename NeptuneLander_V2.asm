@@ -42,10 +42,10 @@ GameStart
     lda #GF_Initialise             ; Initialise the Game
     sta GameStatus
 
-    lda #255
-    sta DemoMode
-    lda #idKeyboard
-    sta InputDevice
+    ;lda #255
+    ;sta DemoMode
+    ;lda #idKeyboard
+    ;sta InputDevice
 
 GameLoop
     LIBSCREEN_WAIT_V 240
@@ -68,14 +68,18 @@ incbin "Intro2.sdd", 1, 1
 ; Level Landscapes
 
 gmLevelOneLandscape
-incbin "NewLandScapeV2.sdd", 1, 1,CHAR
+incbin "NewLandScapeV2.sdd", 1, 1,CHAR, INTERLEAVE
+    byte 0,0
 
 gmLevelTwoLandscape
-incbin "NewLandScapeV2.sdd", 2, 2,CHAR
+incbin "NewLandScapeV2.sdd", 2, 2,CHAR, INTERLEAVE
+    byte 0,0
 
 gmLevelThreeLandscape
-incbin "NewLandScapeV2.sdd", 3, 3,CHAR
+incbin "NewLandScapeV2.sdd", 3, 3,CHAR, INTERLEAVE
+    byte 0,0
 
 gmLevelFourLandscape
-incbin "NewLandScapeV2.sdd", 4, 4,CHAR
+incbin "NewLandScapeV2.sdd", 4, 4,CHAR, INTERLEAVE
+    byte 0,0
 

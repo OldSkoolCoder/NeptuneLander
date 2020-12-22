@@ -152,6 +152,7 @@ GF_Initialise   = 9
 GF_Difficulty   = 10
 GF_DiedSoTryAgain = 11
 GF_LostInSpace  = 12
+GF_AskInputDevice = 13
 
 GD_Easy = 0
 GD_Normal = 1
